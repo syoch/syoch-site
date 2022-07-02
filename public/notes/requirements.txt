@@ -1,8 +1,0 @@
-uvicorn
-fastapi==0.70.0
-aiofiles
-ormar
-watchdog
-fastapi-socketio
-python-multipart
-jinja2
