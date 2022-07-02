@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="jp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <div id="left">
+        <div id="lanes">
+            <div class="lane">
+                <info>
+                    <no>1</no>
+                    <name>hoge</name>
+                </info>
+                <course>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:6;"><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:8;"><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:12;"><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:16;"><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                </course>
+            </div>
+            <div class="lane">
+                <info>
+                    <no>2</no>
+                    <name>fuga</name>
+                </info>
+                <course>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                </course>
+            </div>
+            <div class="lane">
+                <info>
+                    <no>3</no>
+                    <name>kusa</name>
+                </info>
+                <course>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                </course>
+            </div>
+            <div class="lane">
+                <info>
+                    <no>4</no>
+                    <name>veah</name>
+                </info>
+                <course>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                </course>
+            </div>
+            <div class="lane">
+                <info>
+                    <no>5</no>
+                    <name>ipad</name>
+                </info>
+                <course>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                </course>
+            </div>
+            <div class="lane">
+                <info>
+                    <no>6</no>
+                    <name>arch</name>
+                </info>
+                <course>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                </course>
+            </div>
+            <div class="lane">
+                <info>
+                    <no>7</no>
+                    <name>john</name>
+                </info>
+                <course>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                    <sect style="--measure:4;"><SD></SD><SD></SD><SD></SD><SD></SD></sect>
+                </course>
+            </div>
+        </div>
+        <div id="ctrlBar">
+            <btn>Save</btn>
+            <btn>Load</btn>
+            <btn>&lt;</btn>
+            <btn>|&gt;</btn>
+            <btn>&gt;</btn>
+            <input type="range" min=0 max=8 step =1>
+        </div>
+    </div>
+    <div id="ctrlArea">
+        <div id="infos">
+            BPM:<span id="BPM"></span><br>
+            lanes:<span id="lanes"></span>
+        </div>
+        <div id="density">
+            <div class="target">1</div>
+        </div>
+        <div id="targets" style="--size-x:2;--size-y:4">
+            <div class="target"><span>1</span></div>
+            <div class="target"><span>2</span></div>
+            <div class="target"><span>3</span></div>
+            <div class="target"><span>4</span></div>
+            <div class="target"><span>5</span></div>
+            <div class="target"><span>6</span></div>
+            <div class="target"><span>7</span></div>
+            <div class="target"><span>8</span></div>
+        </div>
+    </div>
+    <style>
+        :root {
+            --brdclr: red;
+            --subbrdclr: #ff00ff;
+        }
+        * {
+            margin: 0px;
+            padding: 0px;
+            box-sizing: border-box;
+            overflow: visible;
+        }
+
+        body {
+            background-color: black;
+            color: white;
+            overflow:hidden;
+        }
+
+        /* Left */
+        #left {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            height: 100%;
+            width: calc(100% - 200px);
+        }
+
+        #left>#ctrlBar {
+            position: absolute;
+            bottom: 0px;
+            left: 0px;
+            width: 100%;
+            line-height: 30px;
+            
+            height: 30px;
+            border-width: 1px 0px 0px 0px;
+            border-style: solid;
+            border-color: var(--brdclr);
+
+        }
+
+        #left>#lanes {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            overflow-y: scroll;
+            width: 100%;
+            height: calc(100% - 30px);
+            background-color: #444444;
+        }
+
+        #left>#lanes::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #left>#lanes::-webkit-scrollbar-track {
+            background: black;
+        }
+
+        #left>#lanes::-webkit-scrollbar-corner {
+            background: black;
+        }
+
+        #left>#lanes::-webkit-scrollbar-thumb {
+            background: silver;
+        }
+
+        #left>#lanes>.lane {
+            position: relative;
+            left: 0px;
+            min-width: 100%;
+            height: 40px;
+            background-color: #444444;
+            border: solid var(--brdclr);
+            border-width: 1px 0px 1px 0px;
+            margin: 0px 0px 10px 0px;
+            white-space: nowrap;
+            font-size: 0px;
+        }
+
+        #left>#lanes>.lane>info {
+            display: inline-block;
+            width: 100px;
+            height: 40px;
+            font-size: medium;
+        }
+
+        #left>#lanes>.lane>info>no {
+            display: block;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 30px;
+            height: 100%;
+            border-width: 0px 1px 0px 0px;
+            border-style: solid;
+            border-color: var(--brdclr);
+        }
+
+        #left>#lanes>.lane>info>name {
+            display: block;
+            position: absolute;
+            top: 0px;
+            left: 30px;
+            width: 70px;
+            height: 100%;
+            border-width: 0px 1px 0px 0px;
+            border-style: solid;
+            border-color: var(--brdclr);
+        }
+
+        #left>#lanes>.lane>course {
+            display: inline-block;
+            width: calc(100% - 100px);
+            height: 40px;
+            overflow-x: scroll;
+        }
+
+        #left>#lanes>.lane>course>sect {
+            position: relative;
+            top: 0px;
+            display: inline-block;
+            width: 160px;
+            height: 40px;
+        }
+        #left>#lanes>.lane>course>sect>*:nth-child(n + 2){
+            margin-left:  calc( calc(160px / var(--measure) )  - 30px);
+            
+        }
+        #left>#lanes>.lane>course>sect::after {
+            display: inline-block;
+            position: absolute;
+            top: 0px;
+            left: 20px;
+            width: 1px;
+            height: 40px;
+
+            content: "";
+            background: white;
+        }
+
+        #left>#lanes>.lane>course::-webkit-scrollbar {
+            height: 0px;
+        }
+
+        #left>#lanes>.lane>course::-webkit-scrollbar-track {
+            background: black;
+        }
+
+        #left>#lanes>.lane>course::-webkit-scrollbar-corner {
+            background: black;
+        }
+
+        #left>#lanes>.lane>course::-webkit-scrollbar-thumb {
+            background: silver;
+        }
+
+        /* Controll area */
+        #ctrlArea {
+            position: absolute;
+            height: 100%;
+            width: 200px;
+            top: 0px;
+            right: 0px;
+        }
+
+        #ctrlArea>* {
+            border-width: 0px 1px 1px 1px;
+            border-color: var(--brdclr);
+            border-style: solid;
+        }
+
+        #ctrlArea>#infos {
+            width: 100%;
+            height: 25%;
+        }
+
+        #ctrlArea>#density {
+            width: 100%;
+            height: 25%;
+        }
+
+        #ctrlArea>#targets {
+            position: relative;
+            width: 100%;
+            height: 50%;
+            font-size: 0px;
+        }
+
+        #ctrlArea>#targets>.target {
+            position: relative;
+            display: inline-block;
+            font-size: medium;
+            width: calc(100% / var(--size-x));
+            height: calc(100% / var(--size-y));
+            border: 1px solid var(--subbrdclr);
+        }
+
+        #ctrlArea>#targets>.target>span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+    <style>
+        BD,SD,BK,SK{
+            display: inline-block;
+            width:  0px;
+            height: 0px;
+            border-radius: 100%;
+            content:"";
+        }
+        BD{
+            border: 20px #ff0000 solid;
+            margin: 0px;
+        }
+
+        SD{
+            border: 10px #ff0000 solid;
+            margin: 10px;
+        }
+
+        BK{
+            border: 20px #00ffff solid;
+            margin: 0px;
+        }
+
+        SK{
+            border: 10px #00ffff solid;
+            margin: 10px;
+        }
+
+        split {
+            display: inline-block;
+            width:1px;
+            height:100%;
+            background-color: red;
+            margin: 0px 10px 0px 10px;
+        }
+        btn{
+            display:inline-block;
+            width:100px;
+            height:100%;
+            background-color: #222222;
+            border: solid white;
+            border-width: 1px 5px 1px 5px;
+            border-radius: 10px;
+            text-align: center;
+            transition: 200ms;
+        }
+        btn:hover{
+            background-color: white;
+            color:black;
+            border-color:black;
+        }
+        btn:focus{
+            color:red;
+        }
+    </style>
+</body>
+
+</html>

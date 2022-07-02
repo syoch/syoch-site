@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>syoch's chat</title>
+
+
+  <script type="module">
+    import { initAutoReload } from '../libs/autoreload.js';
+    initAutoReload();
+  </script>
+
+</head>
+
+<body>
+  <div id="app">
+
+    <div id="sidebar">
+      <div id="rooms">
+        <div class="room">Hello</div>
+      </div>
+      <div id="rooms_scroll">
+        <div class="thumb"></div>
+      </div>
+    </div>
+    <div id="chat">
+      <div id="messages">
+        <div class="message">
+          <span class="username">syoch</span>
+          <span class="content">Hello</span>
+        </div>
+
+        <div class="message">
+          <span class="username">uo</span>
+          <span class="content">uoooooooo<br>a</span>
+        </div>
+      </div>
+
+      <div id="input">
+        <input id="input-text" type="text" id="message" placeholder="messageeeeeeee">
+        <button id="send">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <link rel="stylesheet" href="https://unpkg.com/destyle.css@3.0.0/destyle.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.0/css/all.css">
+  <link rel="stylesheet" href="index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.socket.io/4.4.0/socket.io.min.js"
+    integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj"
+    crossorigin="anonymous"></script>
+  <script src="index.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="parent">
+        <div class="div1">
+            Infos/Logs
+            <div id="infos"></div>
+        </div>
+        <div class="div2">
+            <div class="button">Up</div>
+        </div>
+        <div class="div3">Value</div>
+        <div class="div4">
+            <div class="button">Down</div>
+        </div>
+        <div class="div5">
+            <div class="button">Start</div>
+        </div>
+        <div class="div6">
+            MaxValue<br>
+            <input type="range" id="MaxSlider" min=2 max=50 step=1 style="width:100%"><br>
+            =><span id="MaxValue"></span>
+        </div>
+        <div class="div7">Memo<br><textarea id="full"></textarea></div>
+    </div>
+    <script>
+        var step=20;
+        var ch=1;
+        var value=0;
+        $(function () {
+            $(".div2 .button").on("click", function(){
+                if(ch<1)return;
+                value+=ch;
+                ch/=2;
+            });
+            $(".div4 .button").on("click", function(){
+                if(ch<1)return;
+                value-=ch;
+                ch/=2;
+            });
+            $(".div5 .button").on("click", function(){
+                ch=Math.pow(2,step-2);
+                value=ch*2;
+            });
+            setInterval(function(){
+                step=$("#MaxSlider").val();
+                $("#MaxValue").html(Math.pow(2,step-1));
+                $("#infos").html(
+                    `Step : ${step}<br>`+
+                    `_d x : ${ch}<br>`+
+                    `V al : ${value}<br>`+
+                    `end? : ${ch==0.5 ? "yes" : "no"}`
+                );
+                $(".div3").html(value)
+            },100);
+        })
+    </script>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            background-color: black;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            width: auto;
+            height: auto;
+            color: white;
+        }
+        #full{
+            display: block;
+            width: 100%;
+            border:none;
+            resize: none;
+            bottom: 0px;
+
+        }
+        .div3 {
+            border: 1px white solid;
+            text-align: center;
+        }
+
+        .div2 div.button {
+            width: 50%;
+            height: 50%;
+        }
+
+        .div4 div.button {
+            width: 50%;
+            height: 50%;
+        }
+
+        .div5 div.button {
+            width: 50%;
+            height: 50%;
+        }
+
+        .button {
+            display: block;
+            text-align: center;
+            position: relative;
+            top: 50%;
+            left: 50%;
+            transform: translateY(-50%) translateX(-50%);
+            cursor: pointer;
+            background-color: #222222;
+        }
+
+        .parent {
+            display: grid;
+            position: relative;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            grid-column-gap: 0px;
+            grid-row-gap: 0px;
+            height: 100%;
+            width: 100%;
+        }
+
+        .div1 {
+            grid-area: 1 / 1 / 2 / 2;
+        }
+        .div7 {
+            grid-area: 2 / 1 / 4 / 2;
+        }
+        .div2 {
+            grid-area: 1 / 2 / 2 / 3;
+        }
+
+        .div3 {
+            grid-area: 2 / 2 / 3 / 3;
+        }
+
+        .div4 {
+            grid-area: 3 / 2 / 4 / 3;
+        }
+
+        .div5 {
+            grid-area: 2 / 3 / 3 / 4;
+        }
+
+        .div6 {
+            grid-area: 1 / 3 / 2 / 4;
+        }
+    </style>
+</body>
+
+</html>

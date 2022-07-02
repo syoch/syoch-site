@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>abc</title>
+</head>
+
+<body>
+  <div><span id=uo>aaa</span> ← びーむ → <span id=uooo>aaa</span></div>
+  <script>
+    window.onload = function () {
+      var lst = location.search.substr(1).split(",");
+      document.getElementById("uo").innerHTML = decodeURIComponent(lst[0]);
+      document.getElementById("uooo").innerHTML = decodeURIComponent(lst[1]);
+    }
+  </script>
+  <style>
+    body {
+      background-color: black;
+    }
+
+    div {
+      display: inline-block;
+      position: absolute;
+      top: 45%;
+      right: 0px;
+      height: 50px;
+      width: 100vw;
+      text-align: center;
+      font-size: 40px;
+      background-color: white;
+    }
+  </style>
+</body>
+
+</html>

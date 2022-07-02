@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+
+    <title>2048 Clone</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
+</head>
+
+<body onload="on_loaded()">
+
+    <div id="title">
+        2048 Clone By Syoch
+    </div>
+    <div id="Game">
+        <div id="ScoreContainer">
+            <span id="text_score">ScoreBoard</span>
+            <span id="Score"></span>
+            <span id="Highscore">20000</span>
+        </div>
+        <div id="GameController">
+            <div id="status">Status</div>
+            <div id="Restart" onclick="game.init();game.update();">Restart</div>
+            <div id="hack">
+                <span  style="display:inline-block;width:50%;height:100%;" id="rateb">30%</span>
+                <input style="display:inline-block;width:50%;height:100%;" type="range" id="rate" max="10" min=0 value=3>
+            </div>
+            <div id="auto_toggle">Auto<br>Switch</div>
+            <div id="auto_example">
+                <span   style="display:block;width:100%;height:50%;font-size:10%;">Example</span>
+                <select style="display:block;width:100%;height:50%;border-style: none;" id="auto_type">
+                    <option value="ex_swipe">swipe</option>
+                    <option value="ex_if">if</option>
+                    <option value="ex_for">for</option>
+                </select>
+            </div>
+            <div id="auto_script">
+                <textarea style="width: calc(100% - 1px);height:calc(100% - 1px)" id="script" placeholder="Script">
+block swipe
+swipe u
+while isruning{
+ if (0 0) == 2{
+  while (0 0) != 2{
+   swipe d
+  }
+ }
+ swipe u
+}
+allow swipe
+                </textarea>
+            </div>
+        </div>
+        <div id="Board"></div>
+        <div id="Controll">
+            <button class="ModernBtn controll" id="controll_U" onclick="game.Swipe(DIR_U)"></button>
+            <button class="ModernBtn controll" id="controll_D" onclick="game.Swipe(DIR_D)"></button>
+            <button class="ModernBtn controll" id="controll_R" onclick="game.Swipe(DIR_R)"></button>
+            <button class="ModernBtn controll" id="controll_L" onclick="game.Swipe(DIR_L)"></button>
+        </div>
+    </div>
+    <div id="Command">
+        <textarea class="ModernInput" id="chatInput"></textarea>
+        <button class="ModernBtn" id="chatSend">
+            <div id="chatSendBtn"></div>
+        </button>
+    </div>
+    <script>
+        /*
+            Constants
+        */
+
+        //Direction
+        const DIR_U = 0, //Upper
+              DIR_D = 1, //Downer
+              DIR_L = 2, //Lefter
+              DIR_R = 3, //Righter
+              Dir_patterns=["DIR_U","DIR_D","DIR_L","DIR_R"];
+
+        /*
+            Classes
+        */
+        class Game2048 {
+            /*
+            Class of 2048Game
+            */
+            constructor(size) {
+                this.cells = [];
+                this.elems = [];
+                this.gamebase=$("body div#Game");
+                this.parent              =this.gamebase.children("div#Board");
+                this.scorecontainer      =this.gamebase.children("#ScoreContainer");
+                this.score               =this.scorecontainer.children("#Score");
+                this.highscore           =this.scorecontainer.children("#Highscore");
+                this.gamecontrol_contain =this.gamebase.children("div#GameController");
+                this.status              =this.gamecontrol_contain.children("div#status");
+                this.controller_container=this.gamebase.children("div#Controll");
+                
+                //Internal
+                this.currentscore=0;
+                this.highscore=0;
+                this.lastcell=0;
+                this.isswiping=0;
+
+                //Meta
+                this.size = size;
+                this.rate=0.3;
+                this.addcell_size=2;
+
+                var x, y, cellmain;
+                var parentHeight = this.parent.height();
+                var cellsize = parentHeight / size-2;
+
+                for (x = 0; x < size; x++) {
+                    this.cells.push([]);
+                    this.elems.push([]);
+                    for (y = 0; y < size; y++) {
+                        cellmain = $("<div>", {
+                            "style": `height:${cellsize}px;width:${cellsize}px;`,
+                            "class": "cell",
+                            "html": "&emsp;"
+                        });
+                        cellmain.appendTo(this.parent);
+                        this.cells[x].push(0);
+                        this.elems[x].push(cellmain);
+                    }
+                    $("<br>").appendTo(this.parent);
+                    //$("<br>").appendTo(this.parent);
+                }
+                this.init();
+
+                this.              parent.                           css("left", `calc(75% - ${(cellsize+2)*(size+1.5)}px)`);
+                this.              parent.                           css("font-size", `calc( 100% / 10)`);
+                this. gamecontrol_contain.                           css("width",`calc(75% - ${(cellsize+2)*(size+1.5)}px)`);
+                this.controller_container.                           css("left",`calc(75% - ${(cellsize+2)*(size/2-1)}px)`);
+                this.controller_container.                           css("width",`${(cellsize+2)}px`)
+                this.controller_container.children("button").        css("font-size",`${(parentHeight/4)/2}px`)
+                this.            gamebase.children("div#BC_Spliter").css("left",`calc(75% - ${(cellsize+2)*(size/2-0.5)}px)`);
+                this.            gamebase.children("div#BC_Spliter").css("width",`${(cellsize/2)}px`);
+
+                this.gamecontrol_contain.children("div#hack").children("input#rate").change((evt)=>{
+                    this.rate=parseInt(evt.target.value)/10;
+                    this.gamecontrol_contain.children("div#hack").children("span#rateb").text((this.rate*100).toString()+"%");
+                })
+                this.gamecontrol_contain.children("div").click((evt)=>{
+                    console.log(evt.target.id);
+                })
+            }
+            update() {
+                var elem, cell,colrev=0;
+                for (var x = 0; x < this.size; x++) {
+                    for (var y = 0; y < this.size; y++) {
+                        elem = this.elems[x][y];
+                        cell = this.cells[x][y][0];
+                        if(this.cells[x][y][1]==1){
+                            colrev=1;
+                        }else{
+                            colrev=0;
+                        }
+                        
+                        var c=parseInt(cell/8)%0xff;
+                        
+                        elem.css("background-color","#"+
+                            (colrev==0 ? "00" : "ff")+
+                            ("00"+(0xff-c).toString(16)).slice(-2)+
+                            ("00"+(0xff-c).toString(16)).slice(-2));
+                        elem.css("color","#000000");
+                        elem.html(
+                              cell==0
+                            ? "&emsp;"
+                            : cell.toString().split(/(.......)/).filter((a)=>{return a!=""}).join("")
+
+                        );
+                        //console.log(cell.toString().split(/(.......)/).filter((a)=>{return a!=""}).join("<br>"))
+                    }
+                }
+                this.score.text(this.currentscore);
+                this.status.text(
+                    "Gameover:"+(this.checkGameover() ? "Y" : "N")+"\n"+
+                    "Movables:"+(this.movablecell())
+                );
+            }
+            getvalue(x, y){
+                return this.cells[y] != undefined
+                       ? this.cells[y][x] != undefined
+                         ? this.cells[y][x]
+                         :undefined
+                       : undefined
+            };
+            emphycell(){
+                var x=0,
+                    y=0,
+                    ret=0;
+                for(x=0;x<this.size;x++){
+                    for(y=0;y<this.size;y++){
+                        if(this.getvalue(x,y)[0]==0){
+                            ret+=1;
+                        }
+                    }
+                }
+                return ret;
+            }
+            movablecell(){
+                var count=0,
+                    base=0,
+                    up=0,
+                    left=0,
+                    down=0,
+                    right=0,
+                    x=0,
+                    y=0;
+                for(x=0;x<this.size;x++){
+                    for(y=0;y<this.size;y++){
+                        base =this.getvalue(x+0,y+0);
+                        up   =this.getvalue(x+0,y-1);
+                        left =this.getvalue(x-1,y+0);
+                        down =this.getvalue(x+0,y+1);
+                        right=this.getvalue(x+1,y+0);
+                        base =base  ? base [0] :0;
+                        up   =up    ? up   [0] :0;
+                        left =left  ? left [0] :0;
+                        down =down  ? down [0] :0;
+                        right=right ? right[0] :0;
+                        if(base==0)count+=1;
+                        else if(base==up)count+=1;
+                        else if(base==left)count+=1;
+                        else if(base==down)count+=1;
+                        else if(base==right)count+=1;
+                    }
+                }
+                return count;
+            }
+            checkGameover(){
+                
+                if(this.movablecell()==0){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+            addcell(){
+                var x=0,
+                    y=0;
+                if(this.emphycell()==0)return undefined;
+                do{
+                    x=Math.floor(Math.random()*this.size);
+                    y=Math.floor(Math.random()*this.size);
+                }while(this.getvalue(x,y)[0]!=0);
+                var c=Math.random()<this.rate? 4 : 2;
+                this.lastcell=[c,x,y];
+                this.cells[y][x][0]=this.lastcell[0];
+                return this.lastcell
+            }
+            init(){
+                var x,y;
+                for(x=0;x<this.size;x++){
+                    for(y=0;y<this.size;y++){
+                        this.cells[y][x]=[0,0];
+                    }
+                }
+                this.currentscore=0;
+                this.addcell();
+                this.addcell();
+            }
+            swipe1step(d) {
+                var switchbydir=(up,right,down,left)=>{return (
+                      d==DIR_U ? up
+                    : d==DIR_R ? right
+                    : d==DIR_D ? down
+                    : d==DIR_L ? left
+                               : -1
+                )};
+                var x = 0,y = 0,l=0,
+                    board = this.cells,
+                    movecount = 0,
+                    score=0,
+                    max=this.size,
+                    mac=this.size+1,
+                    mab=this.size-1,
+                    mic=-1,
+                    min=0,
+                    sx=switchbydir(min,min,min,mab),
+                    ex=switchbydir(mac,mac,mac,mic),
+                    cx=switchbydir( +1, +1, +1, -1),
+                    dx=switchbydir( +0, +1, +0, -1),
+
+                    sy=switchbydir(min,min,mab,min),
+                    ey=switchbydir(mac,mac,mic,mac),
+                    cy=switchbydir(+1,+1,-1,+1),
+                    dy=switchbydir(-1,+0,+1,+0)
+                    ;
+                movecount = 0;
+                console.log(`${d} x[${sx} ${cx} ${ex}]{${dx}} y[${sy} ${cy} ${ey}]{${dy}}`);
+                for (x = sx; x != ex; x+=cx) {
+                for (y = sy; y != ey; y+=cy) {
+                        var a = this.getvalue(x, y);
+                        var b = this.getvalue(x + dx, y + dy);
+                        //console.log(`(${x},${y})[${a?a:[1,1]}] (${x + dx},${y + dy})[${b?b:[1,1]}]`);
+                        if(a==undefined||b==undefined)continue;
+                        if(a[0] == 0 || b[0] == 0)continue;
+
+                        if (a[0]==b[0] && a[1]==0) {
+                            //console.log("s");
+                            movecount += 1;
+                            score+=(1/a[0])*10;
+
+                            b[0] = a[0] * this.addcell_size;
+                            b[1] = 1;
+                            a[0] = 0;
+                            a[1] = 0;
+                            
+                            this.currentscore+=this.cells[y][x][0];
+                        }else if(a[0] != 0 && b[0] == 0){
+                            //console.log("m");
+                            movecount += 1;
+                            score+=2;
+                            
+                            b[0]= a[0];
+                            b[1]= a[1];
+                            a[0] = 0;
+                            a[1] = 0;
+                        }
+                        this.update();
+                    }
+                }
+                //console.log(game.cells.map((a)=>{return a.map((a)=>{return `${("   "+a[0]).slice(-3)}[${a[1]}]`;}).join("|");}).join("\n"));
+                if (movecount != 0) {
+                    this.isswiping =1;
+                }else{
+                    this.isswiping=0;
+                }
+                this.update();
+                return score;
+            }
+            Swipe(direction){
+                var x=0,y=0,
+                    score=0,
+                    noswi=1,
+                    i=0;
+                return new Promise((resolve,reject)=>{
+                    var timer=setInterval(()=>{
+                        score+=this.swipe1step(direction);
+                        if(this.isswiping==1)noswi=0;
+                        if(this.isswiping==0){
+                            clearInterval(timer);
+                            for(x=0;x<this.size;x++){
+                                for(y=0;y<this.size;y++){
+                                    this.cells[x][y][1]=0;
+                                }
+                            }
+                            if(noswi!=1){
+                                for(i=0;i<this.addcell_size;i++){
+                                    this.addcell();
+                                }
+                            }
+                            this.checkGameover();
+                            this.update();
+                            resolve(score+10*this.movablecell());
+                        }
+                    },1000);
+                });
+            }
+        }
+
+        /*
+            Vars
+        */
+        var game;
+        var network;
+        /*
+            Functions
+        */
+        var swipe=(d)=>{
+            var score;
+            var backscore=game.currentscore;
+            var backupcells=Object.assign([],game.cells);
+            score=game.Swipe(d);
+            game.cells=backupcells;
+            game.currentscore=backscore;
+            return score;
+        }
+        
+        function autos_thinker(){
+            var a,b,c,d,i=0,running,timer,arr,dir,gameover=0;
+            function think(){
+                a=swipe(DIR_U);
+                b=swipe(DIR_D);
+                c=swipe(DIR_L);
+                d=swipe(DIR_R)
+                arr=[a,b,c,d]
+                dir=arr.indexOf(Math.max.apply(0,arr));
+                game.Swipe(dir);
+                console.log(`Step of ${("000"+i.toString()).slice(-3)} pattern ${Dir_patterns[dir]} with score:${arr[dir]}`);
+                i++;
+                if(game.checkGameover()==true){
+                    console.log("Gameover Reset",i);
+                    game.init();
+                    game.update();
+                    gameover+=1;
+                    i=0;
+                }
+            }
+            function ptn1(){
+                if(i%4==2)game.Swipe(DIR_R);
+                if(i%4==1)game.Swipe(DIR_U);
+                if(i%4==2)game.Swipe(DIR_R);
+                if(i%4==3)game.Swipe(DIR_U);
+                i++;
+                if(game.checkGameover()==true){
+                    console.log("Gameover Reset",i);
+                    game.init();
+                    game.update();
+                    gameover+=1;
+                    i=0;
+                }
+            }
+            timer=setInterval(()=>{
+                if(running==1){
+                    console.warn("Timer   :Now running!");
+                    return;
+                }
+                running=1;
+
+                ptn1();
+                if(gameover==0){
+                    game.init();
+                    game.update();
+                    console.log("End");
+                    clearInterval(timer);
+                }
+
+                running=0;
+            },50);
+                
+            
+        }
+        function on_loaded() {
+            game = new Game2048(4);
+            game.init();
+            game.update();
+            autos_thinker();
+            document.onkeydown=(evt)=>{
+                     if(evt.key== "ArrowDown")game.Swipe(DIR_D);
+                else if(evt.key==   "ArrowUp")game.Swipe(DIR_U);
+                else if(evt.key== "ArrowLeft")game.Swipe(DIR_R);
+                else if(evt.key=="ArrowRight")game.Swipe(DIR_L);
+            };
+        }
+    </script>
+    <style>
+        /* Modern Style*/
+        .ModernInput {
+            display: inline-block;
+            border: 1px solid #808080;
+            background-color: #ffffff;
+            resize: none;
+        }
+        .ModernBtn {
+            display: inline-block;
+            border: 1px solid #0000ff;
+            background-color: #ffffff;
+        }
+        .controll{
+            display:block;
+            background:#808080;
+            border-width:calc(1em - 3px);
+            margin:2.5px;
+            padding:1.5px;
+            border-style: solid;
+            width:0px;
+            height:0px;
+        }
+        
+
+        /* Body and All*/
+        * {
+            margin: 0px;
+            padding: 0px;
+            box-sizing: content-box;
+        }
+        body {
+            background: cornsilk;
+            height: 100vh;
+            width: 100vw;
+            overflow-x: hidden;
+            font-family: serif;
+            font-size: 20px;
+        }
+        body:last-child::after {
+            clear: both;
+        }
+        body>div {
+            float: left;
+        }
+
+        div#title {
+            background: #ffffff;
+            height: 10%;
+            width: 100%;
+            font-size: bold;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        div#Game {
+            display: inline-block;
+            height: 90%;
+            width: 75%;
+            background: #ffeebb;
+        }
+        div#Game div#ScoreContainer {
+            display: inline-block;
+            height: 10%;
+            width: 100%;
+        }
+        div#Game div#ScoreContainer span#text_score {
+            display: inline-block;
+            height: 100%;
+            width: 50%;
+        }
+        div#Game div#ScoreContainer span#Score {
+            display: inline-block;
+            height: 100%;
+            width: 20%;
+        }
+        div#Game div#ScoreContainer span#Highscore {
+            display: inline-block;
+            height: 100%;
+            width: 20%;
+        }
+        div#Game div#GameController{
+            display: grid;
+            background: #ffffcc;
+            height: 80%;
+            position: absolute;
+            top: 20%;
+            left:0px;
+            grid-template-columns: 50% 50%;
+            grid-template-rows: 20% 20% 20% 20% 20%;
+        }
+        div#Game div#GameController div{
+            display:inline-block;
+            background:#eecc99;
+            border:1px solid #00ffff;
+            cursor: pointer;
+            text-align: center;
+            font-size:1.0rem;
+        }
+        div#Game div#GameController div#status{
+            grid-row-start: 1;
+            grid-row-end: 2;
+            grid-column-start: 1;
+            grid-column-end: 3;
+            cursor:text;
+        }
+        div#Game div#GameController div#hack span{
+            display:inline-block;
+            font-size: 50%;
+        }
+        div#Game div#GameController div#auto_script{
+            grid-row-start: 4;
+            grid-row-end: 6;
+            grid-column-start: 1;
+            grid-column-end: 3;
+            cursor:text;
+        }
+        div#Game div#GameController div#auto_script textarea{
+            background:#ffddaa;
+            resize:none;
+            overflow-y: hidden;
+        }
+        
+        div#Game div#Board {
+            display: block;
+            background: #ffddaa;
+            height: 80%;
+            width: 100%;
+            position: absolute;
+            top: 20%;
+        }
+        div#Game div#Board div.cell {
+            display: inline-block;
+            background-color: #eecc99;
+            border: 1px solid #ccaa77;
+            border-radius: 10%;
+            text-align: center;
+            color: #880000;
+        }
+        div#Game div#Controll {
+            display: block;
+            background: transparent;
+            height: 80%;
+            width: 10%;
+            position: absolute;
+            top: 20%;
+        }
+        div#Game div#Controll button#controll_U{
+            border-color:transparent transparent #000000 transparent;
+        }
+        div#Game div#Controll button#controll_D{
+            border-color:#000000 transparent transparent transparent;
+        }
+        div#Game div#Controll button#controll_R{
+            border-color:transparent #000000 transparent transparent;
+        }
+        div#Game div#Controll button#controll_L{
+            border-color:transparent transparent transparent #000000;            padding:1.5px;
+        }
+
+        div#Command {
+            display: inline-block;
+            position: relative;
+            background: cornsilk;
+            height: 90%;
+            width: 25%;
+        }
+        div#Command textarea#chatInput {
+            position: absolute;
+            height: 10%;
+            width: 75%;
+            bottom: 0px;
+            left: 0px;
+        }
+        div#Command button#chatSend {
+            position: absolute;
+            height: 10%;
+            width: 25%;
+            bottom: 0px;
+            right: 0px;
+            cursor: pointer;
+        }
+        div#Command button#chatSend #chatSendBtn {
+            position: absolute;
+            font-size: 100%;
+            height: 0%;
+            width: 0%;
+            left: 1em;
+            top: 0px;
+            border-style: solid;
+            border-width: 1em 1em 1em 1em;
+            border-color: transparent transparent transparent #0000ff;
+        }
+    </style>
+</body>
+
+</html>

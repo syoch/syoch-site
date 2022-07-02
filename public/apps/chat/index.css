@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+1&display=swap');
+
+:root {
+  --scrollbar-size: 3px;
+  --scrollbar-color: #c0c0c0;
+  --scrollbar-bk-color: transparent;
+  --scrollbar-height: 1cm;
+}
+
+* {
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'M PLUS 1', sans-serif;
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+  background-color: #e0e0e0;
+  display: flex;
+
+  overflow-y: hidden;
+}
+
+/* Sidebar */
+#app>#sidebar {
+  margin: 10px;
+  width: calc(25% - 20px);
+  height: calc(100% - 20px);
+  display: flex;
+}
+
+#app>#sidebar>#rooms {
+  width: calc(100% - 2 * var(--scrollbar-size));
+  height: fit-content;
+  border: 1px solid red;
+}
+
+#app>#sidebar>#rooms>.room {
+  margin: 0px 0px 10px 0px;
+  width: 100%;
+  height: 50px;
+  border-radius: 58px;
+  box-shadow: -18px 18px 36px #a6a6a6, 18px -18px 36px #ffffff;
+  line-height: 50px;
+  text-align: center;
+
+  transition: 0.5s;
+}
+
+#app>#sidebar>#rooms>.room:hover {
+  box-shadow: -20px 20px 36px #969696, 20px -20px 36px #ffffff;
+  cursor: pointer;
+}
+
+#app>#sidebar>#rooms>.room:active {
+  background: linear-gradient(225deg, #cacaca, #f0f0f0);
+}
+
+#app>#sidebar>#rooms_scroll {
+  width: calc(2 * var(--scrollbar-size));
+  height: 100%;
+  background-color: var(--scrollbar-bk-color);
+  border-radius: var(--scrollbar-size);
+}
+
+#app>#sidebar>#rooms_scroll>.thumb {
+  background-color: var(--scrollbar-color);
+  height: var(--scrollbar-height);
+  border-radius: var(--scrollbar-size);
+}
+
+#app>#chat {
+  width: 75%;
+  height: 100%;
+  padding: 10px;
+}
+
+/* Messages */
+
+#app>#chat>#messages {
+  width: 100%;
+  height: calc(100% - 60px);
+  margin-bottom: 10px;
+  border-radius: 20px;
+  padding: 20px;
+}
+
+#app>#chat>#messages>.message {
+  width: 100%;
+}
+
+#app>#chat>#messages>.message>span.username {
+  display: block;
+}
+
+#app>#chat>#messages>.message>span.content {
+  display: block;
+  margin-left: 10px;
+}
+
+/* Input */
+
+#app>#chat>#input {
+  width: 100%;
+  height: 50px;
+  border-radius: 15px;
+  box-shadow: -18px 18px 36px #a6a6a6, 18px -18px 36px #ffffff;
+  padding: 10px;
+}
+
+#app>#chat>#input>#input-text {
+  width: calc(100% - 40px);
+  height: 100%;
+  border-radius: 10px;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border: none;
+  outline: none;
+  font-size: 20px;
+}
+
+#app>#chat>#input>#send {
+  height: 30px;
+  width: 30px;
+  line-height: 30px;
+  text-align: center;
+}
+
+#app>#chat>#input>#send>i {
+  padding: 7px 0 0 7px;
+  height: 100%;
+  width: 100%;
+}

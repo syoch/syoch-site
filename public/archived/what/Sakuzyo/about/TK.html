@@ -1,0 +1,60 @@
+<html>
+
+<head>
+  <title>TK is...</title>
+</head>
+
+<body>
+  <div id="container">
+    <h1 id=a>TK is</h1>
+    <p id=b></p>
+    <p id=c></p>
+  </div>
+
+  <script>
+    const res = [
+      "About TK",
+      "TK is",
+      "NSFW"
+    ];
+
+    var elements = [
+      document.getElementById("a"),
+      document.getElementById("b"),
+      document.getElementById("c")
+    ];
+
+    setInterval(() => {
+      for (let i = 0; i < elements.length; i++) {
+        const element = elements[i];
+        element.innerHTML = res[i];
+      }
+    }, 50);
+  </script>
+  <style>
+    #a,
+    #c {
+      text-align: center;
+      font-family: "Times New Roman", Times, serif;
+    }
+
+    #a {
+      font-size: 20px;
+    }
+
+    #c {
+      font-size: 200px;
+    }
+
+    #container {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      height: 100vh;
+      width: 100vw;
+      background-color: #cccccc;
+    }
+  </style>
+</body>
+
+</html>
