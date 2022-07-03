@@ -9,17 +9,34 @@
     lsht: "&#x2A02;",
     rsht: "&#x2192;",
     not: "&#x00AC;",
+    DIV: "&#x00F7;",
+    MOD: "&#x2225;",
+    MUL: "&#x00D7;",
+    ADD: "&#x002B;",
+    SUB: "&#x2212;",
+    PARENTSIS: "( )",
+    ONE: "1",
+    TWO: "2",
+    THREE: "3",
+    FOUR: "4",
+    FIVE: "5",
+    SIX: "6",
+    SEVEN: "7",
+    EIGHT: "8",
+    NINE: "9",
+    ZERO: "0",
+    DOT: ".",
   };
   const icon_mapping = {
     BS: "backspace",
   };
   const config = {
     grid: [
-      ["bits", "encode", "presicion", "AC", "( )", "/"],
-      ["or", "and", "7", "8", "9", "*"],
-      ["not", "xor", "4", "5", "6", "-"],
-      ["neg2", "neg1", "1", "2", "3", "+"],
-      ["negs", "neg", "0", ".", "BS", "="],
+      ["bits", "encode", "presicion", "AC", "PARENTSIS", "DIV"],
+      ["or", "and", "SEVEN", "EIGHT", "NINE", "MUL"],
+      ["not", "xor", "FOUR", "FIVE", "SIX", "SUB"],
+      ["neg2", "neg1", "ONE", "TWO", "THREE", "ADD"],
+      ["negs", "neg", "ZERO", "DOT", "BS", "="],
     ],
   };
 </script>
@@ -30,31 +47,23 @@
     LOG2 <br />
     LOG3 <br />
   </div>
-  <div
+  <span
+    style:position="absolute"
+    style:top="85%"
+    style:left="50%"
+    style:transform="translate(-50%,-50%)"
+    style:font-size="x-large"
+  >
+    hello world!
+  </span>
+  <span
     style:position="absolute"
     style:bottom="0"
-    style:left="0"
-    style:height="30%"
-    style:width="100%"
+    style:right="0"
+    style:font-size="large"
   >
-    <span
-      style:position="absolute"
-      style:top="50%"
-      style:left="50%"
-      style:transform="translate(-50%,-50%)"
-      style:font-size="x-large"
-    >
-      hello world!
-    </span><br />
-    <span
-      style:position="absolute"
-      style:bottom="0"
-      style:right="0"
-      style:font-size="large"
-    >
-      => (00000)_{2}
-    </span><br />
-  </div>
+    => (00000)_{2}
+  </span>
 </div>
 
 <div id="input_form">
@@ -65,9 +74,11 @@
         variant="text"
       >
         {#if cell in html_mapping}
-          {@html html_mapping[cell]}
+          <span style="font-size: 5vw;">{@html html_mapping[cell]}</span>
         {:else if cell in icon_mapping}
-          <Icon class="material-icons">{icon_mapping[cell]}</Icon>
+          <Icon class="material-icons" style="font-size: 5vw;"
+            >{icon_mapping[cell]}</Icon
+          >
         {:else if cell === ""}
           &nbsp;
         {:else}
