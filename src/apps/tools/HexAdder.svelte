@@ -9,9 +9,7 @@
     diff = diff_storage;
   }
 
-  $: {
-    localStorage.setItem("diff", diff);
-  }
+  $: localStorage.setItem("diff", diff);
 </script>
 
 <Textfield bind:value={inp} label="Input" /><br />

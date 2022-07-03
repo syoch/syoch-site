@@ -18,8 +18,9 @@
 	import HexAdder from "./apps/tools/HexAdder.svelte";
 	import PPCDisassembler from "./apps/wiiu/PPCDisassembler.svelte";
 	import Introducation from "./apps/Introducation/index.svelte";
+	import Calc from "./apps/calc/index.svelte";
 
-	let active = "syoch";
+	let active = "Calculator";
 	let open = false;
 </script>
 
@@ -58,6 +59,7 @@
 				bind:open
 			/>
 			<DrawerItem name="HEX Adder" icon="hexagon" bind:active bind:open />
+			<DrawerItem name="Calculator" icon="hexagon" bind:active bind:open />
 		</List>
 	</Content>
 </Drawer>
@@ -86,6 +88,8 @@
 			<HexAdder />
 		{:else if active == "syoch"}
 			<Introducation />
+		{:else if active == "Calculator"}
+			<Calc />
 		{/if}
 	</main>
 </AppContent>
