@@ -65,8 +65,6 @@
     xor: "^",
     or: "|",
     and: "&",
-    lsht: "<<",
-    rsht: ">>",
     not: "~",
 
     neg1: " as neg1",
@@ -76,6 +74,9 @@
   const icon_mapping = {
     BS: "backspace",
   };
+  const BS = "BS";
+  const AC = "AC";
+
   const config = {
     grid: [
       ["bits", "encode", "presicion", "AC", "PARENTSIS", "DIV"],
@@ -119,9 +120,13 @@
         style="grid-row: {r + 1}; grid-column: {c + 1}; height: 100%;"
         variant="text"
         on:click={() => {
-          formula += display_mapping[cell] || ` ${cell} `;
-          log.push(cell);
-          log = log;
+          if (cell == BS) {
+            formula = formula.slice(0, -1);
+          } else if (cell == AC) {
+            formula = "";
+          } else {
+            formula += display_mapping[cell] || ` ${cell} `;
+          }
         }}
       >
         {#if cell in html_mapping}
