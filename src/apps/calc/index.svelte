@@ -2,9 +2,7 @@
   import Button, { Icon } from "@smui/button";
 
   let log: String[] = [];
-  let formula: string = "";
-
-  $: console.log(log);
+  let formula: string = "1^2&3^4|5&6";
 
   const html_mapping = {
     and: "&#x2227;",
@@ -67,13 +65,14 @@
     and: "&",
     not: "~",
 
-    neg1: " as neg1",
-    neg2: " as neg2",
-    negs: " as negs",
+    neg1: " as neg1 ",
+    neg2: " as neg2 ",
+    negs: " as negs ",
   };
   const icon_mapping = {
     BS: "backspace",
   };
+
   const BS = "BS";
   const AC = "AC";
 
