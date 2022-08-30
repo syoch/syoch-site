@@ -2,7 +2,7 @@
   import InlineConverter from "@components/InlineConverter.svelte";
   import Textfield from "@smui/textfield";
 
-  // let d = new cs.Capstone(cs.ARCH_PPC, cs.MODE_BIG_ENDIAN);
+  let d = new cs.Capstone(cs.ARCH_PPC, cs.MODE_BIG_ENDIAN);
 
   let value = "";
   let code: Array<number>;
@@ -24,9 +24,9 @@
     .map((x) => parseInt(x, 16));
 
   $: try {
-    // disassembled = d.disasm(code, offset);
+    disassembled = d.disasm(code, offset, 0);
   } catch (error) {
-    disassembled = [];
+    disassembled = [{ mnemonic: "Error", op_str: "" }];
   }
 
   $: copy_buffer = disassembled
