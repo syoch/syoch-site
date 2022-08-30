@@ -31,7 +31,7 @@ function serve() {
 		}
 	};
 }
-
+console.log(`Production mode: ${production}`);
 export default {
 	input: 'src/main.ts',
 	output: {
@@ -56,7 +56,7 @@ export default {
 		alias({
 			entries: [
 				{ find: "@components", replacement: path.resolve(__dirname, "src/components"), },
-				{ find: "@datas", replacement: path.resolve(__dirname, "src/datas"), }
+				{ find: "@datas", replacement: path.resolve(__dirname, "src/datas"), },
 			]
 		}),
 
@@ -88,6 +88,8 @@ export default {
 		production && terser()
 	],
 	watch: {
-		clearScreen: false
+		clearScreen: false,
+		chokidar: true,
+		include: ['src/**/*']
 	}
 };

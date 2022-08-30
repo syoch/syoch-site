@@ -1,6 +1,7 @@
 <script lang="ts">
   import SizedTextarea from "@components/SizedTextarea.svelte";
-  // import Parser from "./cafecode";
+
+  import Parser from "./cafecode";
 
   let source = "";
   let converted = "";
@@ -15,9 +16,9 @@
     .trim();
 
   $: {
-    // let parser = new Parser(source);
-    // let ast = parser.parse();
-    // converted = ast.map((v) => v.toString()).join("\n");
+    let parser = new Parser(source);
+    let ast = parser.parse();
+    converted = ast.map((v) => v.toString()).join("\n");
   }
 </script>
 

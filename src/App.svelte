@@ -19,6 +19,7 @@
   import PPCDisassembler from "./apps/wiiu/PPCDisassembler.svelte";
   import Introducation from "./apps/Introducation/index.svelte";
   import Calc from "./apps/calc/index.svelte";
+  import Debug from "./apps/Debug.svelte";
 
   let active = "Debug";
   let open = false;
@@ -90,6 +91,8 @@
       <Introducation />
     {:else if active == "Calculator"}
       <Calc />
+    {:else if active == "Debug"}
+      <Debug />
     {/if}
   </main>
 </AppContent>

@@ -1,4 +1,4 @@
 <script lang="ts">
 </script>
 
-FirebaseApp
+FirebaseApp uouo a a a a v

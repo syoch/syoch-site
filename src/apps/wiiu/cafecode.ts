@@ -1,14 +1,15 @@
+
+
 let d = new cs.Capstone(cs.ARCH_PPC, cs.MODE_BIG_ENDIAN);
 
 // https://stackoverflow.com/a/37471538
 // Thanks!!!
 
-function parseFloat(integer) {
-  var sign = ((integer >>> 31) == 0) ? 1.0 : -1.0;
-  var e = ((integer >>> 23) & 0xff);
-  var m = (e == 0) ? (integer & 0x7fffff) << 1 : (integer & 0x7fffff) | 0x800000;
-  var f = sign * m * Math.pow(2, e - 150);
-  return f;
+function parseFloat(integer): number {
+  let sign = ((integer >>> 31) == 0) ? 1.0 : -1.0;
+  let e = ((integer >>> 23) & 0xff);
+  let m = (e == 0) ? (integer & 0x7fffff) << 1 : (integer & 0x7fffff) | 0x800000;
+  return sign * m * Math.pow(2, e - 150);
 }
 
 const OPERATOR_TYPES = {
@@ -33,13 +34,19 @@ const CONST_CODE = {
   ]
 };
 
-class Stmt {
+abstract class Stmt {
+  _errors: string[];
+
   constructor() {
     this._errors = [];
   }
+
+  abstract stringify(): string;
+
   detect_errors() {
     this._errors.push("Stmt is abstract");
   }
+
   toString() {
     this.detect_errors();
 
@@ -49,11 +56,11 @@ class Stmt {
     }
     return ret;
   }
+
 }
-class BlockStmt extends Stmt {
-  constructor(stmts) {
+abstract class BlockStmt extends Stmt {
+  constructor(protected _stmts: Stmt[]) {
     super();
-    this._stmts = stmts;
   }
   toString() {
     let ret = super.toString();
@@ -74,22 +81,11 @@ class BlockStmt extends Stmt {
 }
 
 class IfNode extends BlockStmt {
-  /**
-   * @param {boolean} pointer_type
-   * @param {int} size
-   * @param {number} address
-   * @param {string} op
-   * @param {Value} right
-   * @param {Array<Stmt>} _stmts
-   */
-  constructor(pointer_type, size, address, op, right, _stmts) {
+
+  constructor(
+    protected pointer_type: number, protected size: number, protected address: number, protected op: string, protected right: number, protected _stmts: Stmt[]) {
     super(_stmts);
-    this.pointer_type = pointer_type;
-    this.size = size;
-    this.address = address;
-    this.op = op;
-    this.right = right;
-    this._stmts = _stmts;
+
   }
   detect_errors() {
     if (this.right >= 2 ** this.size) {
@@ -124,19 +120,14 @@ class IfNode extends BlockStmt {
   }
 }
 class LoadPointerStmt extends Stmt {
-  /**
-   * @param {boolean} pointer_type
-   * @param {number} address
-   * @param {number} start
-   * @param {number} end
-   */
-  constructor(pointer_type, address, start, end) {
+  constructor(
+    protected pointer_type: number,
+    protected address: number,
+    protected start: number,
+    protected end: number
+  ) {
     super();
 
-    this.pointer_type = pointer_type;
-    this.address = address;
-    this.start = start;
-    this.end = end;
   }
   detect_errors() {
     if (this.pointer_type != 0 && this.pointer_type != 1) {
@@ -162,35 +153,23 @@ class LoadPointerStmt extends Stmt {
   }
 }
 class AddOffsetStmt extends Stmt {
-  /**
-   * @param {number} offset
-   */
-  constructor(offset) {
+  constructor(protected offset: number) {
     super()
-    this.offset = offset;
   }
+
   detect_errors() {
     if (this.offset >= 2 ** 24) {
       this._errors.push("Out of bounds");
     }
   }
+
   stringify() {
     return `ptr += 0x${this.offset.toString(16)}`;
   }
 }
 class RamWriteStmt extends Stmt {
-  /**
-   * @param {boolean} pointer_type
-   * @param {number} size
-   * @param {number} address
-   * @param {number} value
-   */
-  constructor(pointer_type, size, address, value) {
+  constructor(protected pointer_type: number, protected size: number, protected address: number, protected value: number) {
     super();
-    this.pointer_type = pointer_type;
-    this.size = size;
-    this.address = address;
-    this.value = value;
   }
   detect_errors() {
     if (this.value >= 2 ** this.size) {
@@ -219,13 +198,7 @@ class RamWriteStmt extends Stmt {
   }
 }
 class StringWriteStmt extends Stmt {
-  /**
-   * @param {boolean} pointer_type
-   * @param {number} address
-   * @param {Array<number>} values
-   * @param {number} last
-   */
-  constructor(pointer_type, address, values, last) {
+  constructor(protected pointer_type: number, protected address: number, protected values: number[], protected last: number) {
     super();
     this.pointer_type = pointer_type;
     this.address = address;
@@ -247,7 +220,7 @@ class StringWriteStmt extends Stmt {
     ret += ", [";
     ret += this.values.
       map((v) => {
-        var valid =
+        let valid =
           (v > 47 && v < 58) || // number keys
           v == 32 || v == 13 || // spacebar & return key(s) (if you want to allow carriage returns)
           (v > 64 && v < 91) || // letter keys
@@ -271,55 +244,42 @@ class StringWriteStmt extends Stmt {
   }
 }
 class AssemblyExecuteStmt extends Stmt {
-  /**
-   * @param {Array<number>} machineCodes
-   */
-  constructor(machineCodes) {
+  instructions: any[]; // TODO: fix this
+
+  constructor(machine_codes: number[]) {
     super();
     let raw_machinecode = [];
-    for (let i = 0; i < machineCodes.length; i++) {
-      raw_machinecode.push(machineCodes[i] >> 0x18 & 0xff);
-      raw_machinecode.push(machineCodes[i] >> 0x10 & 0xff);
-      raw_machinecode.push(machineCodes[i] >> 0x08 & 0xff);
-      raw_machinecode.push(machineCodes[i] >> 0x00 & 0xff);
+    for (let i = 0; i < machine_codes.length; i++) {
+      raw_machinecode.push(machine_codes[i] >> 0x18 & 0xff);
+      raw_machinecode.push(machine_codes[i] >> 0x10 & 0xff);
+      raw_machinecode.push(machine_codes[i] >> 0x08 & 0xff);
+      raw_machinecode.push(machine_codes[i] >> 0x00 & 0xff);
     }
-    this.instructions = d.disasm(raw_machinecode, 0x0);
+    this.instructions = d.disasm(raw_machinecode, 0x0, 0);
   }
+
   detect_errors() { }
+
   stringify() {
     let ret = "";
     ret += "asm {\n";
-    for (let i = 0; i < this.instructions.length; i++) {
-      let instruction = this.instructions[i];
+    for (const element of this.instructions) {
+      let instruction = element;
       ret += `  ${instruction.mnemonic ?? "mne"} ${instruction.op_str ?? "op"}\n`;
     }
     ret += "}\n"
-    return ret;
 
     return ret;
   }
 }
 class RegisterAssign extends Stmt {
-  /**
-   * @param {boolean} pointer_type
-   * @param {number} size
-   * @param {number} register
-   * @param {number} address
-   * @param {boolean} is_integer
-   * @param {boolean} is_load
-   */
-  constructor(pointer_type, size, register, address, is_integer, is_load) {
+  size: String;
+
+  constructor(protected pointer_type: number, size: number | null, protected register: number, protected address: number, protected is_integer: boolean, protected is_load: boolean) {
     super();
-
-    this.is_integer = is_integer;
-    this.register = register;
-
-    this.pointer_type = pointer_type;
-    this.address = address;
-
-    this.is_load = is_load;
-    this.size = size;
+    this.size = size ? size.toString() : "";
   }
+
   detect_errors() {
     if (this.pointer_type != 0 && this.pointer_type != 1) {
       this._errors.push("Invalid pointer type");
@@ -353,25 +313,8 @@ class RegisterAssign extends Stmt {
   }
 }
 class RegisterOperatorStmt extends Stmt {
-  /**
-   * @param {boolean} is_int
-   * @param {number} type
-   * @param {number} right
-   * @param {number} left
-   * @param {number} value
-   * @param {boolean} is_immidiate
-   */
-  constructor(is_int, type, right, left, value, is_immidiate,) {
+  constructor(protected is_int: boolean, protected type: number, protected right: number, protected left: number, protected value: number, protected is_immidiate: boolean) {
     super();
-    this.type = type;
-
-    this.is_int = is_int;
-    this.left = left;
-
-    this.right = right;
-
-    this.value = value;
-    this.is_immidiate = is_immidiate;
   }
   detect_errors() {
     if (8 < this.type && this.type < 0) {
@@ -394,7 +337,7 @@ class RegisterOperatorStmt extends Stmt {
 
     let right = "";
     if (this.is_immidiate) {
-      right = parseFloat(this.value);
+      right = parseFloat(this.value).toString();
     } else {
       right = prefix + this.right;
     }
@@ -408,30 +351,22 @@ class RegisterOperatorStmt extends Stmt {
   }
 }
 class TimerStmt extends BlockStmt {
-  /**
-   * @param {number} frames
-   * @param {Array<Stmt>} body
-   */
-  constructor(frames, body) {
+  constructor(protected frames: number, body) {
     super(body);
-    this.frames = frames;
   }
+
   detect_errors() {
 
   }
+
   stringify() {
     return `timer (${this.frames})`;
   }
 }
 class TimerResetStmt extends Stmt {
-  /**
-   * @param {number} value
-   * @param {number} addr
-   */
-  constructor(value, addr) {
+
+  constructor(protected value: number, protected addr: number) {
     super();
-    this.addr = addr;
-    this.value = value;
   }
   detect_errors() {
     if (this.value < 0 || this.value >= 2 ** 16) {
@@ -446,9 +381,8 @@ class SyscallStmt extends Stmt {
   /**
    * @param {number} syscall
    */
-  constructor(syscall) {
+  constructor(protected syscall: number) {
     super();
-    this.syscall = syscall;
   }
   detect_errors() { }
   stringify() {
@@ -456,29 +390,28 @@ class SyscallStmt extends Stmt {
   }
 }
 class UndefinedStmt extends Stmt {
-  /**
-   * @param {string} opcode
-   */
-  constructor(opcode) {
+  constructor(protected opcode: number) {
     super();
-    this.opcode = opcode;
   }
+
   stringify() {
     return `Undefined<0x${this.opcode.toString(16)}>`;
   }
 }
 
-class Parser {
-  constructor(src) {
+export default class Parser {
+  src: Array<number>;
+  constructor(_src) {
     /**
      * @type {Array<number>}
-     */
-    this.src = src.replace(/\r|\n|\s/g, "");
-    if (this.src.length % 2 != 0) {
-      this.src += "0";
+    */
+
+    let src = _src.replace(/\r|\n|\s/g, "");
+    if (src.length % 2 != 0) {
+      src += "0";
     }
-    this.src = this.src.split(/(..)/).slice(1).filter(x => x.length == 2);
-    this.src = this.src.map(x => parseInt(x, 16));
+    src = src.split(/(..)/).slice(1).filter(x => x.length == 2);
+    this.src = src.map(x => parseInt(x, 16));
   }
   read_byte() {
     return this.src.shift();
@@ -496,8 +429,16 @@ class Parser {
     return ret;
   }
 
-  convert_size(src) {
-    return [8, 16, 32][src];
+  convert_size(src: number): number | null {
+    if (src == 0) {
+      return 8;
+    } else if (src == 1) {
+      return 16;
+    } else if (src == 2) {
+      return 32;
+    } else {
+      return null;
+    }
   }
   convert_operator(src) {
     return [
@@ -721,7 +662,7 @@ class Parser {
     }
   }
 
-  parseStmts(sentinel) {
+  parseStmts(sentinel = undefined) {
     if (sentinel == undefined) {
       sentinel = CONST_CODE.TERMINATOR;
     }

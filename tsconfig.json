@@ -36,10 +36,10 @@
       "@smui/*": [
         "./node_modules/@smui/*"
       ]
-    }
+    },
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
   ],
   "exclude": [
     "node_modules/*",
