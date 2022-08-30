@@ -11,3 +11,6 @@ export const app = initializeApp({
   measurementId: "G-589H0RDJQP"
 });
 export const analytics = getAnalytics(app);
+console.log(`Firebase Initalized {app: ${app}, analytics: ${analytics}}`);
+//@ts-ignore
+window.firebase = app;
