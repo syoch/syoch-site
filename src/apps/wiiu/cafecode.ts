@@ -231,9 +231,7 @@ class StringWriteStmt extends Stmt {
           let ch = String.fromCharCode(v);
           return `'${ch}'`;
         } else {
-          console.log("v =", v);
-          return v;
-          // return "0x" + v.toString(16);
+          return "0x" + ("00" + v.toString(16)).slice(-2);
         }
       }).
       join(", ");
@@ -249,13 +247,17 @@ class AssemblyExecuteStmt extends Stmt {
   constructor(machine_codes: number[]) {
     super();
     let raw_machinecode = [];
-    for (let i = 0; i < machine_codes.length; i++) {
-      raw_machinecode.push(machine_codes[i] >> 0x18 & 0xff);
-      raw_machinecode.push(machine_codes[i] >> 0x10 & 0xff);
-      raw_machinecode.push(machine_codes[i] >> 0x08 & 0xff);
-      raw_machinecode.push(machine_codes[i] >> 0x00 & 0xff);
+    for (const code of machine_codes) {
+      raw_machinecode.push(code >> 0x18 & 0xff);
+      raw_machinecode.push(code >> 0x10 & 0xff);
+      raw_machinecode.push(code >> 0x08 & 0xff);
+      raw_machinecode.push(code >> 0x00 & 0xff);
     }
-    this.instructions = d.disasm(raw_machinecode, 0x0, 0);
+    try {
+      this.instructions = d.disasm(raw_machinecode, 0x0, 0);
+    } catch (e) {
+      this.instructions = [{ mnemonic: "Error", op_str: "" }]
+    }
   }
 
   detect_errors() { }
