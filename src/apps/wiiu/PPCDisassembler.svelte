@@ -4,10 +4,17 @@
 
   let d = new cs.Capstone(cs.ARCH_PPC, cs.MODE_BIG_ENDIAN);
 
+  let selection_start = 0;
+  let selection_line_start;
+  $: selection_line_start = Math.floor(selection_start / 9);
+
+  let selection_end = 0;
+  let selection_line_end;
+  $: selection_line_end = Math.floor(selection_end / 9);
+
   let value = "";
   let code: Array<number>;
-  let copy_buffer: string;
-  let disassembled: Array<any> = [{ mnemonic: "", op_str: "" }];
+  let disassembled: string[] = [];
 
   $: value = value
     .replace(/[^0-9a-fA-F]/g, "")
@@ -24,14 +31,16 @@
     .map((x) => parseInt(x, 16));
 
   $: try {
-    disassembled = d.disasm(code, offset, 0);
+    disassembled = d
+      .disasm(code, offset, 0)
+      .map((x) => `${x.mnemonic ?? ""} ${x.op_str ?? ""}`);
   } catch (error) {
-    disassembled = [{ mnemonic: "Error", op_str: "" }];
+    disassembled = [];
   }
 
+  let copy_buffer: string;
   $: copy_buffer = disassembled
-    .filter((_, i) => selection_range_start <= i && i <= selection_range_end)
-    .map((x) => `${x.mnemonic ?? ""} ${x.op_str ?? ""}`)
+    .filter((_, i) => selection_line_start <= i && i <= selection_line_end)
     .join("\n");
 
   let offset_str = "02000000";
@@ -39,12 +48,6 @@
 
   let offset = 0;
   $: offset = offset_str ? parseInt(offset_str, 16) : 0;
-
-  let selection_start = 0;
-  let selection_end = 0;
-
-  $: selection_range_start = Math.floor(selection_start / 9);
-  $: selection_range_end = Math.floor(selection_end / 9);
 </script>
 
 <InlineConverter
@@ -61,11 +64,10 @@
     {#each disassembled as asm, i}
       {@html "&nbsp;".repeat(8) + "|"}
       <span
-        class:highlight-cyan={selection_range_start <= i &&
-          i <= selection_range_end}
+        class:highlight-cyan={selection_line_start <= i &&
+          i <= selection_line_end}
       >
-        {asm.mnemonic ?? ""}
-        {asm.op_str ?? ""}
+        {asm}
       </span>
       <br />
     {/each}
