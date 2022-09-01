@@ -21,7 +21,7 @@
   import Calc from "./apps/calc/index.svelte";
   import Debug from "./apps/Debug.svelte";
 
-  let active = "Debug";
+  let active = "PowerPC Disassembler";
   let open = false;
 </script>
 
