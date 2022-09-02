@@ -12,7 +12,17 @@
   let selection_line_end;
   $: selection_line_end = Math.floor(selection_end / 9);
 
-  let value = "";
+  let value =
+    "38600002\n" +
+    "3d800200\n" +
+    "618c0040\n" +
+    "7d8903a6\n" +
+    "4e800421\n" +
+    "38800003\n" +
+    "3d800200\n" +
+    "618c0080\n" +
+    "7d8903a6\n" +
+    "4e800421";
   let code: Array<number>;
   let disassembled: string[] = [];
 
