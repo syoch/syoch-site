@@ -12,9 +12,10 @@
   <div><span id=uo>aaa</span> ← びーむ → <span id=uooo>aaa</span></div>
   <script>
     window.onload = function () {
-      var lst = location.search.substr(1).split(",");
-      document.getElementById("uo").innerHTML = decodeURIComponent(lst[0]);
-      document.getElementById("uooo").innerHTML = decodeURIComponent(lst[1]);
+      [
+        document.getElementById("uo").innerHTML,
+        document.getElementById("uooo").innerHTML
+      ] = location.search.substr(1).split(",").map(decodeURIComponent);
     }
   </script>
   <style>
