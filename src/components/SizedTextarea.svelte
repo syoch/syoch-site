@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Textfield, { TextfieldComponentDev } from "@smui/textfield";
+  import Textfield from "@smui/textfield";
 
   export let value: string;
   export let style = "";
@@ -7,7 +7,7 @@
   export let height: string;
   export let width: string;
 
-  let field: TextfieldComponentDev = null;
+  let field = null;
 
   export let textarea: HTMLTextAreaElement = null;
   $: if (field) {
@@ -23,12 +23,5 @@
   input$resizable={false}
   style="height: {height}; width: {width}; {style};"
   input$style="margin: 0px; padding: 16px; height: 100%; width: 100%; font-family: {font};"
-  class="textfield"
+  class="sized-textfield"
 />
-
-<style>
-  :global(.textfield > span) {
-    height: 100%;
-    width: 100%;
-  }
-</style>

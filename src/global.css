@@ -63,3 +63,8 @@ button:not(:disabled):active {
 button:focus {
 	border-color: #666;
 }
+
+.sized-textfield > span {
+	height: 100%;
+	width: 100%;
+}
