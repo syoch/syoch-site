@@ -1,6 +1,7 @@
 <script lang="ts">
   import InlineConverter from "@components/InlineConverter.svelte";
   import Textfield from "@smui/textfield";
+  import { FoldingProcessor } from "./ppc_folding";
 
   let d = new cs.Capstone(cs.ARCH_PPC, cs.MODE_BIG_ENDIAN);
 
@@ -13,18 +14,22 @@
   $: selection_line_end = Math.floor(selection_end / 9);
 
   let value =
-    "38600002\n" +
-    "3d800200\n" +
-    "618c0040\n" +
-    "7d8903a6\n" +
-    "4e800421\n" +
-    "38800003\n" +
-    "3d800200\n" +
-    "618c0080\n" +
-    "7d8903a6\n" +
-    "4e800421";
-  let code: Array<number>;
-  let disassembled: string[] = [];
+    "38 60 00 02\n" + // li      r3,2
+    "3d 80 02 00\n" + // lis     r12,512
+    "61 8c 00 40\n" + // ori     r12,r12,64
+    "7d 89 03 a6\n" + // mtctr   r12
+    "4e 80 04 21\n" + // bctrl
+    "38 80 00 03\n" + // li      r4,3
+    "3d 80 02 00\n" + // lis     r12,512
+    "61 8c 00 80\n" + // ori     r12,r12,128
+    "7d 89 03 a6\n" + // mtctr   r12
+    "4e 80 04 21\n" + // bctrl
+    "7c 63 1b 78\n" + // mr      r3,r3
+    "3d 80 20 00\n" + // lis     r12,8192
+    "81 8c 02 00\n" + // lwz     r12,0x0200(r12)
+    "7d 89 03 a6\n" + // mtctr   r12
+    "4e 80 04 21\n" + // bctrl
+    "";
 
   $: value = value
     .replace(/[^0-9a-fA-F]/g, "")
@@ -33,6 +38,7 @@
     .filter(Boolean)
     .join("\n");
 
+  let code: Array<number>;
   $: code = value
     .replace(/[^0-9a-fA-F]/g, "")
     .split(/(..)/)
@@ -40,12 +46,23 @@
     .filter((x) => x.length == 2)
     .map((x) => parseInt(x, 16));
 
+  let disassembled: string[] = [];
   $: try {
     disassembled = d
       .disasm(code, offset, 0)
-      .map((x) => `${x.mnemonic ?? ""} ${x.op_str ?? ""}`);
+      .map((x) => `${x.mnemonic ?? ""} ${x.op_str ?? ""}`)
+      .map((x) => x.trim());
   } catch (error) {
     disassembled = [];
+  }
+
+  let folded: string[] = [];
+  $: {
+    let p = new FoldingProcessor();
+    folded = d.disasm(code, offset, 0).map((x) => {
+      let f = p.foldInstruction(x);
+      return f ? "# " + f : "";
+    });
   }
 
   let copy_buffer: string;
@@ -78,6 +95,10 @@
           i <= selection_line_end}
       >
         {asm}
+        {@html "&nbsp;".repeat(20 - asm.length)}
+      </span>
+      <span style:background_color="ff0000">
+        {folded[i]}
       </span>
       <br />
     {/each}
