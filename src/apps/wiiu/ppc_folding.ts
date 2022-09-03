@@ -48,15 +48,24 @@ namespace values {
       return "0x" + this.value.toString(16);
     }
   }
+  export class Reference extends Value {
+    constructor(public ptr: number) {
+      super();
+    }
+
+    toString() {
+      return "*" + this.ptr.toString(16);
+    }
+  }
 
   export class FunctionCall extends Value {
-    constructor(public address: number, public args: Value[]) {
+    constructor(public address: Value, public args: Value[]) {
       super();
     }
 
     toString() {
       let args = this.args.map((arg) => arg.toString()).join(', ');
-      return `func[0x${this.address.toString(16)}](${args})`;
+      return `func[${this.address}](${args})`;
     }
   }
 
@@ -87,6 +96,8 @@ namespace values {
     }
     return new Or(value, v);
   }
+
+
 }
 
 export class FoldingProcessor {
@@ -150,7 +161,7 @@ export class FoldingProcessor {
       }
       case "mtctr": {
         this.ctr = this.get_register(args[0]);
-        return `ctr <- ${this.ctr}`;
+        break;
       }
       case "bctrl": {
         let last_argument_register = 3;
@@ -161,13 +172,30 @@ export class FoldingProcessor {
           }
         }
 
-        // clear argument registers without r3, r4
-        for (let i = 5; i <= last_argument_register; i++) {
+        const args = this.general_registers.slice(3, last_argument_register + 1);
+        const ret = `func[${this.ctr}](${args.join(", ")})`;
+
+        // clear argument registers
+        for (let i = 3; i <= last_argument_register; i++) {
           this.general_registers[i] = values.undefinedValue;
         }
 
-        const args = this.general_registers.slice(3, last_argument_register + 1).join(", ");
-        return `func[${this.ctr}](${args})`
+        // Sets return value to r3
+        this.general_registers[3] = new values.FunctionCall(this.ctr, args);
+
+        return ret;
+      }
+      case "mr": {
+        this.assign_register(args[0], this.get_register(args[1]));
+        break;
+      }
+      case "lwz": {
+        const dest = parseInt(args[0].slice(1));
+        const [_, offset_str, regname] = args[1].match(/([^(]+)\(([^)]*)\)$/);
+        const base = this.get_register(regname);
+        const offset = parseInt(offset_str);
+        this.general_registers[dest] = new values.Reference(values.add(base, new values.Immediate(offset)));
+        break;
       }
       default: {
         return inst.mnemonic + " " + inst.op_str;
