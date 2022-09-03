@@ -49,12 +49,12 @@ namespace values {
     }
   }
   export class Reference extends Value {
-    constructor(public ptr: number) {
+    constructor(public ptr: Value) {
       super();
     }
 
     toString() {
-      return "*" + this.ptr.toString(16);
+      return "*" + this.ptr.toString();
     }
   }
 
