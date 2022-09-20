@@ -37,20 +37,16 @@
     .filter(Boolean)
     .join("\n");
 
-  let code: Array<number>;
-  $: code = value
-    .replace(/[^0-9a-fA-F]/g, "")
-    .split(/(..)/)
-    .slice(1)
-    .filter((x) => x.length == 2)
-    .map((x) => parseInt(x, 16));
-
-  let disassembled: string[] = [];
+  let disassembled: cs.Instruction[] = [];
   $: try {
-    disassembled = d
-      .disasm(code, offset, 0)
-      .map((x) => `${x.mnemonic ?? ""} ${x.op_str ?? ""}`)
-      .map((x) => x.trim());
+    disassembled = d.disasm(
+      value
+        .split(/(..)/)
+        .filter((x) => x.length == 2)
+        .map((x) => parseInt(x, 16)),
+      offset,
+      0
+    );
   } catch (error) {
     disassembled = [];
   }
@@ -58,9 +54,13 @@
   let folded: string[] = [];
   $: {
     let p = new FoldingProcessor();
-    folded = d.disasm(code, offset, 0).map((x) => {
-      let f = p.foldInstruction(x);
-      return f ? "# " + f : "";
+    folded = disassembled.map((x) => {
+      try {
+        let f = p.foldInstruction(x);
+        return f ? "# " + f : "";
+      } catch (e) {
+        return "";
+      }
     });
   }
 
@@ -87,7 +87,9 @@
   </svelte:fragment>
 
   <svelte:fragment slot="overlay">
-    {#each disassembled as asm, i}
+    {#each disassembled
+      .map((x) => `${x.mnemonic ?? ""} ${x.op_str ?? ""}`)
+      .map((x) => x.trim()) as asm, i}
       {@html "&nbsp;".repeat(8) + "|"}
       <span
         class:highlight-cyan={selection_line_start <= i &&
