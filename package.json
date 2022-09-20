@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "wasm": "cd wasm; wasm-pack build --target web",
+    "wasm": "wasm-pack build ./wasm --target web",
     "dev": "vite",
-    "build": "npm run wasm; vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
