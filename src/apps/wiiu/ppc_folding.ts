@@ -191,11 +191,20 @@ export class FoldingProcessor {
       }
       case "lwz": {
         const dest = parseInt(args[0].slice(1));
-        const [_, offset_str, regname] = args[1].match(/([^(]+)\(([^)]*)\)$/);
+        const [_, offset_str, regname] = args[1].match(/(.*)\((.+)\)$/);
         const base = this.get_register(regname);
-        const offset = parseInt(offset_str);
+        const offset = parseInt(offset_str || "0");
         this.general_registers[dest] = new values.Reference(values.add(base, new values.Immediate(offset)));
-        break;
+
+        return `r${dest} = *(${base} + ${offset})`;
+      }
+      case "stw": {
+        const dest = parseInt(args[0].slice(1));
+        const [_, offset_str, regname] = args[1].match(/(.*)\((.+)\)$/);
+        const base = this.get_register(regname);
+        const offset = parseInt(offset_str || "0");
+
+        return `*(${base} + ${offset}) = ${this.general_registers[dest]}`;
       }
       default: {
         return inst.mnemonic + " " + inst.op_str;
