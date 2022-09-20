@@ -45,7 +45,7 @@
 <div class="overlayable_textarea" style="${style}">
   <div
     bind:this={overlay_element}
-    style="position:absolute; top: 0px; left: 0px; width: 100%; height:100%; overflow-y: scroll; padding: 16px; line-height: 1.5rem; font-family: monospace;letter-spacing: 0.009375rem; font-size: 1rem; font-weight: 400;"
+    style="position:absolute; top: 0px; left: 0px; width: 100%; height:100%; overflow-y: scroll; padding: 16px; line-height: 1.5rem; font-family: 'Fira Code Light', monospace;letter-spacing: 0.009375rem; font-size: 1rem; font-weight: 400;"
   >
     <slot />
   </div>

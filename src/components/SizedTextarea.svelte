@@ -9,6 +9,10 @@
 
   let field = null;
 
+  if (font == "monospace") {
+    font = "'Fira Code Light', monospace";
+  }
+
   export let textarea: HTMLTextAreaElement = null;
   $: if (field) {
     textarea = field.getElement().children[1]
