@@ -21,10 +21,10 @@
   import Calc from "./apps/calc/index.svelte";
   import Debug from "./apps/Debug.svelte";
   import GHSDemangle from "./apps/tools/GHSDemangle.svelte";
+  import config from "./location_hash";
 
-  let active = "syoch";
+  let active = config.app || localStorage.getItem("active_app") || "syoch";
   $: localStorage.setItem("active_app", active);
-  active = localStorage.getItem("active_app") || active;
 
   let open = false;
 </script>
