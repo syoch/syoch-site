@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "wasm": "cd wasm; wasm-pack build --target web",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
@@ -28,7 +29,8 @@
     "svelte-preprocess": "^4.10.7",
     "tslib": "^2.4.0",
     "typescript": "^4.6.4",
-    "vite": "^3.0.7"
+    "vite": "^3.0.7",
+    "vite-plugin-wasm-pack": "^0.1.12"
   },
   "dependencies": {
     "@alexaltea/capstone-js": "^3.0.5",

@@ -20,8 +20,9 @@
   import Introducation from "./apps/Introducation/index.svelte";
   import Calc from "./apps/calc/index.svelte";
   import Debug from "./apps/Debug.svelte";
+  import GHSDemangle from "./apps/tools/GHSDemangle.svelte";
 
-  let active = "PowerPC Disassembler";
+  let active = "GHS Demangle";
   let open = false;
 </script>
 
@@ -59,6 +60,7 @@
         bind:active
         bind:open
       />
+      <DrawerItem name="GHS Demangle" icon="undo" bind:active bind:open />
       <DrawerItem name="HEX Adder" icon="hexagon" bind:active bind:open />
       <DrawerItem name="Calculator" icon="hexagon" bind:active bind:open />
     </List>
@@ -91,6 +93,8 @@
       <Introducation />
     {:else if active == "Calculator"}
       <Calc />
+    {:else if active == "GHS Demangle"}
+      <GHSDemangle />
     {:else if active == "Debug"}
       <Debug />
     {/if}

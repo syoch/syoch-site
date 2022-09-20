@@ -8,6 +8,7 @@ export default defineConfig({
     alias: {
       "@components/": `${__dirname}/src/components/`,
       "@datas/": `${__dirname}/src/datas/`,
+      "@src/": `${__dirname}/src/`,
     },
   }
 })

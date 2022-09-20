@@ -15,6 +15,9 @@
       ],
       "@smui/*": [
         "./node_modules/@smui/*"
+      ],
+      "@src/*": [
+        "./src/*"
       ]
     },
     /**
