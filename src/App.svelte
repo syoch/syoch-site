@@ -22,7 +22,10 @@
   import Debug from "./apps/Debug.svelte";
   import GHSDemangle from "./apps/tools/GHSDemangle.svelte";
 
-  let active = "GHS Demangle";
+  let active = "syoch";
+  $: localStorage.setItem("active_app", active);
+  active = localStorage.getItem("active_app") || active;
+
   let open = false;
 </script>
 
