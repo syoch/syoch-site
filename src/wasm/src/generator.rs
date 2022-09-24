@@ -4,7 +4,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[wasm_bindgen]
 pub fn generate_user_id() -> String {
     let dt: DateTime<Local> = Local::now();
-    let timestamp: i64 = dt.timestamp();
+    let mut timestamp: i64 = dt.timestamp();
 
     let mut id = "".to_string();
     while timestamp > 0 {
@@ -22,7 +22,9 @@ pub fn generate_user_id() -> String {
         };
 
         id.push(digit);
+        timestamp >>= 6;
     }
 
+    id = id.chars().rev().collect();
     id
 }
