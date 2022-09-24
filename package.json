@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "wasm": "wasm-pack build ./wasm --target web",
+    "wasm": "wasm-pack build ./src/wasm --target web",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
