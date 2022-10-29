@@ -37,5 +37,8 @@
     "@firebase/firestore": "^3.4.14",
     "sirv-cli": "^2.0.0",
     "sveltefire": "^0.1.5"
-  }
+  },
+  "repository": "https://github.com/syoch/syoch-site",
+  "author": "syoch <syoch64@gmail.com>",
+  "license": "MIT"
 }
