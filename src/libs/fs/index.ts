@@ -1,0 +1,31 @@
+import * as types from "./types";
+
+export * as types from "./types";
+export type { Object as FSObj } from "./types";
+
+export function fromJSON(obj: object): types.Object {
+  if (obj == null) {
+    return new types.Null();
+  } else if (typeof obj === "number") {
+    if (obj - Math.floor(obj) === 0) {
+      return new types.Int(obj);
+    } else {
+      return new types.Float(obj);
+    }
+  } else if (typeof obj === "string") {
+    return new types.String(obj);
+  } else if (typeof obj === "boolean") {
+    return new types.Bool(obj);
+  } else if (Array.isArray(obj)) {
+    return new types.List(obj.map(fromJSON));
+  } else if (typeof obj === "object") {
+    return new types.Dict(
+      Object.keys(obj).reduce((acc, key) => {
+        acc[key] = fromJSON(obj[key]);
+        return acc;
+      }, {})
+    );
+  } else {
+    throw new Error("Unknown type");
+  }
+}
