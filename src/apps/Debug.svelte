@@ -96,12 +96,19 @@
 
         const files = obj.list();
         write(`Current Directory: ${cursor.get_cwd()}\n`);
-        for (const file of files) {
-          const file_obj = obj.get_child(file);
+        for (const file_name of files) {
+          const file = obj.get_child(file_name);
 
-          write(
-            `${file.padEnd(20, " ")} ${fs.types.ObjectKind[file_obj.kind]}\n`
-          );
+          const line =
+            file_name.padEnd(20, " ") +
+            " " +
+            fs.types.ObjectKind[file.kind].padEnd(8);
+
+          if (!fs.isDict(file)) {
+            write(`${line} [${file.toJSON()}]\n`);
+          } else {
+            write(`${line}\n`);
+          }
         }
 
         break;
