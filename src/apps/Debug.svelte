@@ -80,6 +80,15 @@
 ><br />
 
 <Terminal
+  prompt={() =>
+    "/" +
+    cursor
+      .get_cwd()
+      .split("/")
+      .filter(Boolean)
+      .map((x) => (x[0] == "?" ? x.slice(0, 2) : x[0]))
+      .join("/") +
+    " $"}
   handler={(cmd, write) => {
     let [command, ...args] = cmd.trim().split(" ");
     switch (command) {

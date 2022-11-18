@@ -5,6 +5,7 @@
     write("<Default cmd handler> " + cmd);
     return;
   };
+  export let prompt = () => "$";
 
   export let session = new TerminalSession();
 
@@ -12,22 +13,25 @@
   session.subscribe_output((x) => {
     output = x;
   });
+
+  let current_prompt = prompt();
 </script>
 
 <div class="wrapper">
   <pre class="content">{output}</pre>
   <div class="input">
-    <div class="prompt">$&nbsp;</div>
+    <div class="prompt">{current_prompt}&nbsp;</div>
     <input
       class="input"
       type="text"
       bind:value={session.input}
       on:keydown={(e) => {
         if (e.key === "Enter") {
-          session.write("$ " + session.input + "\n");
+          session.write(`${current_prompt} ${session.input}\n`);
           handler(session.input, (s) => {
             session.write(s);
           });
+          current_prompt = prompt();
           session.input = "";
         }
       }}
@@ -43,7 +47,7 @@
     padding: 10px;
     border-radius: 5px;
 
-    height: 200rem;
+    height: 30rem;
     background-color: #444;
     color: #eee;
 
