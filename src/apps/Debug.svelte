@@ -112,7 +112,7 @@
         if (fs.isDict(obj)) {
           const new_obj = obj.get_child(going_to);
           if (!fs.isDict(new_obj)) {
-            write(`Cannot cd to non Dict object`);
+            write(`Cannot cd to non-Dict object`);
           }
           cursor.cd(going_to);
         }
