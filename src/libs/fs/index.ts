@@ -50,7 +50,11 @@ export class Cursor {
 
     return cur;
   }
-  get_cwd(): String {
+  get_cwd(): string {
     return this.cwd;
+  }
+
+  cd(dir_name: string) {
+    this.cwd += dir_name + "/";
   }
 }

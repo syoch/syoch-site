@@ -6,8 +6,12 @@
     return;
   };
 
-  export let output = "";
-  export let input = "";
+  export let session = new TerminalSession();
+
+  let output = "";
+  session.subscribe_output((x) => {
+    output = x;
+  });
 </script>
 
 <div class="wrapper">
@@ -17,14 +21,14 @@
     <input
       class="input"
       type="text"
-      bind:value={input}
+      bind:value={session.input}
       on:keydown={(e) => {
         if (e.key === "Enter") {
-          output += "$ " + input + "\n";
-          handler(input, (s) => {
-            output += s;
+          session.write("$ " + session.input + "\n");
+          handler(session.input, (s) => {
+            session.write(s);
           });
-          input = "";
+          session.input = "";
         }
       }}
     />
@@ -39,7 +43,7 @@
     padding: 10px;
     border-radius: 5px;
 
-    height: 200px;
+    height: 200rem;
     background-color: #444;
     color: #eee;
 

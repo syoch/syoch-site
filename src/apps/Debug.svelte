@@ -2,8 +2,6 @@
   import { generate_user_id } from "@src/wasm/pkg/wasm";
   import * as fs from "@src/libs/fs";
   import Terminal from "@components/Terminal.svelte";
-  import { ObjectKind } from "@src/libs/fs/types";
-  import { DebugTerminalSession } from "./DebugTerminal";
 
   let root = fs.fromJSON({
     usr: {
@@ -72,7 +70,7 @@
     id = e.toString();
   }
 
-  let session = new DebugTerminalSession();
+  // let session = new DebugTerminalSession();
 </script>
 
 <button
@@ -85,8 +83,8 @@
   handler={(cmd, write) => {
     let [command, ...args] = cmd.trim().split(" ");
     switch (command) {
-      case "ls":
-        let obj = cursor.get_object();
+      case "ls": {
+        const obj = cursor.get_object();
         if (!obj) {
           write("Failed to get object");
         }
@@ -96,10 +94,10 @@
           break;
         }
 
-        let files = obj.list();
+        const files = obj.list();
         write(`Current Directory: ${cursor.get_cwd()}\n`);
         for (const file of files) {
-          let file_obj = obj.get_child(file);
+          const file_obj = obj.get_child(file);
 
           write(
             `${file.padEnd(20, " ")} ${fs.types.ObjectKind[file_obj.kind]}\n`
@@ -107,9 +105,19 @@
         }
 
         break;
-      case "cd":
+      }
+      case "cd": {
         const going_to = args.join(" ");
-      // if (cursor.get_object() as fs.types.Dict)
+        const obj = cursor.get_object();
+        if (fs.isDict(obj)) {
+          const new_obj = obj.get_child(going_to);
+          if (!fs.isDict(new_obj)) {
+            write(`Cannot cd to non Dict object`);
+          }
+          cursor.cd(going_to);
+        }
+        break;
+      }
 
       default:
         write(`Unknown command: ${command}`);
