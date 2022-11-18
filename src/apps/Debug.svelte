@@ -116,6 +116,12 @@
       case "cd": {
         const going_to = args.join(" ");
         const obj = cursor.get_object();
+
+        if (going_to == "..") {
+          cursor.parent();
+          break;
+        }
+
         if (fs.isDict(obj)) {
           const new_obj = obj.get_child(going_to);
           if (!fs.isDict(new_obj)) {

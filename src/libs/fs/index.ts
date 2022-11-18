@@ -50,6 +50,9 @@ export class Cursor {
 
     return cur;
   }
+  parent() {
+    this.cwd = this.cwd.split("/").slice(0, -2).join("/") + "/";
+  }
   get_cwd(): string {
     return this.cwd;
   }
