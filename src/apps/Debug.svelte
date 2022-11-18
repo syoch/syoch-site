@@ -4,6 +4,7 @@
   import Terminal from "@components/Terminal.svelte";
 
   let root = fs.fromJSON({
+    a: [1, 2, 3],
     usr: {
       packages: {},
       mime: {
@@ -113,7 +114,7 @@
             " " +
             fs.types.ObjectKind[file.kind].padEnd(8);
 
-          if (!fs.isDict(file)) {
+          if (!(fs.isDict(file) || fs.isList(file))) {
             write(`${line} [${file.toJSON()}]\n`);
           } else {
             write(`${line}\n`);
@@ -121,6 +122,10 @@
         }
 
         break;
+      }
+      case "dump": {
+        const obj = cursor.get_object();
+        write(obj.dump() + "\n");
       }
       case "cd": {
         const going_to = args.join(" ");

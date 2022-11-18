@@ -33,6 +33,9 @@ export function fromJSON(obj: object): types.Object {
 export function isDict(obj: any): obj is types.Dict {
   return obj.flag_dict !== undefined;
 }
+export function isList(obj: any): obj is types.List {
+  return obj.flag_list !== undefined;
+}
 
 export class Cursor {
   constructor(private root: types.Object, private cwd: string) {

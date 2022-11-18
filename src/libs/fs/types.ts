@@ -14,7 +14,8 @@ export interface Object {
   kind: ObjectKind;
 
   get_value();
-  toJSON();
+  toJSON(): string;
+  dump(): string;
 }
 
 class ValueObject<T> implements Object {
@@ -29,8 +30,12 @@ class ValueObject<T> implements Object {
     return this.value;
   }
 
-  toJSON() {
+  toJSON(): string {
     return this.value.toString();
+  }
+
+  dump(): string {
+    return this.toJSON();
   }
 }
 
@@ -40,6 +45,10 @@ export class Int extends ValueObject<number> {
 
 export class String extends ValueObject<string> {
   kind = ObjectKind.String;
+
+  dump() {
+    return `"${this.value}"`;
+  }
 }
 
 export class Float extends ValueObject<number> {
@@ -54,11 +63,20 @@ export class Bytes extends ValueObject<Uint8Array> {
 }
 
 export class List extends ValueObject<Object[]> {
+  flag_list = true;
   kind = ObjectKind.List;
+
+  toJSON() {
+    return `"List[${this.get_value().length}]"`;
+  }
+
+  dump() {
+    return "[" + this.get_value().map(x => x.dump()).join(",") + "]"
+  }
 }
 
 export class Dict extends ValueObject<{ [key: string]: Object }> {
-  flag_dict = null;
+  flag_dict = true;
   kind = ObjectKind.Dict;
 
   list() {
@@ -72,6 +90,11 @@ export class Dict extends ValueObject<{ [key: string]: Object }> {
   toJSON(): string {
     const table = this.get_value();
     return "{" + Object.keys(table).map(key => key + ":" + ObjectKind[table[key].kind]).join(",") + "}";
+  }
+
+  dump(): string {
+    const table = this.get_value();
+    return "{" + Object.keys(table).map(key => key + ":" + table[key].dump()).join(",") + "}";
   }
 }
 
@@ -88,6 +111,9 @@ export class Null implements Object {
   }
 
   toJSON() {
+    return "null";
+  }
+  dump(): string {
     return "null";
   }
 }
