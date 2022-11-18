@@ -1,97 +1,93 @@
+import type { FSObj } from ".";
+
+export enum ObjectKind {
+  Int,
+  String,
+  Boolean,
+  Float,
+  Bytes,
+  List,
+  Dict, Null
+};
 
 export interface Object {
+  kind: ObjectKind;
+
   get_value();
+  toJSON();
 }
 
-export class Int implements Object {
-  value: number;
+class ValueObject<T> implements Object {
+  value: T;
+  kind: ObjectKind;
 
-  constructor(value: number) {
+  constructor(value: T) {
     this.value = value;
   }
 
   get_value() {
     return this.value;
   }
-}
-export class String implements Object {
-  value: string;
 
-  constructor(value: string) {
-    this.value = value;
-  }
-
-  get_value() {
-    return this.value;
-  }
-}
-export class Float implements Object {
-  value: number;
-
-  constructor(value: number) {
-    this.value = value;
-  }
-
-  get_value() {
-    return this.value;
-  }
-}
-export class Bool implements Object {
-  value: boolean;
-
-  constructor(value: boolean) {
-    this.value = value;
-  }
-
-  get_value() {
-    return this.value;
+  toJSON() {
+    return this.value.toString();
   }
 }
 
-export class Bytes implements Object {
-  value: Uint8Array;
-
-  constructor(value: Uint8Array) {
-    this.value = value;
-  }
-
-  get_value() {
-    return this.value;
-  }
+export class Int extends ValueObject<number> {
+  kind = ObjectKind.Int;
 }
 
-export class List implements Object {
-  value: Object[];
-
-  constructor(value: Object[]) {
-    this.value = value;
-  }
-
-  get_value() {
-    return this.value;
-  }
+export class String extends ValueObject<string> {
+  kind = ObjectKind.String;
 }
 
-export class Dict implements Object {
-  value: { [key: string]: Object };
+export class Float extends ValueObject<number> {
+  kind = ObjectKind.Float;
+}
+export class Bool extends ValueObject<boolean> {
+  kind = ObjectKind.Boolean;
+}
 
-  constructor(value: { [key: string]: Object }) {
-    this.value = value;
+export class Bytes extends ValueObject<Uint8Array> {
+  kind = ObjectKind.Bytes;
+}
+
+export class List extends ValueObject<Object[]> {
+  kind = ObjectKind.List;
+}
+
+export class Dict extends ValueObject<{ [key: string]: Object }> {
+  flag_dict = null;
+  kind = ObjectKind.Dict;
+
+  list() {
+    return Object.keys(this.get_value());
   }
 
-  get_value() {
-    return this.value;
+  get_child(key: string): Object {
+    return this.get_value()[key];
+  }
+
+  toJSON(): string {
+    const table = this.get_value();
+    return "{" + Object.keys(table).map(key => key + ":" + ObjectKind[table[key].kind]).join(",") + "}";
   }
 }
 
 export class Null implements Object {
   value: null;
+  kind = ObjectKind.Null;
 
-  constructor() {
+  constructor(public flag_null: string = "") {
     this.value = null;
   }
 
   get_value() {
     return this.value;
+  }
+
+  toJSON() {
+    return "null";
   }
 }

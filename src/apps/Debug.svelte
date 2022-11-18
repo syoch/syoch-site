@@ -1,6 +1,9 @@
 <script lang="ts">
   import { generate_user_id } from "@src/wasm/pkg/wasm";
   import * as fs from "@src/libs/fs";
+  import Terminal from "@components/Terminal.svelte";
+  import { ObjectKind } from "@src/libs/fs/types";
+  import { DebugTerminalSession } from "./DebugTerminal";
 
   let root = fs.fromJSON({
     usr: {
@@ -58,12 +61,18 @@
     },
   });
 
+  let cursor = new fs.Cursor(root, "/");
+
+  eval("window.cursor = cursor");
+
   let id = "";
   try {
     id = generate_user_id();
   } catch (e) {
     id = e.toString();
   }
+
+  let session = new DebugTerminalSession();
 </script>
 
 <button
@@ -71,5 +80,39 @@
     id = generate_user_id();
   }}>Regenerate ID: {id}</button
 ><br />
-<h2>FS</h2>
-<pre>{JSON.stringify(root, null, 2)}</pre>
+
+<Terminal
+  handler={(cmd, write) => {
+    let [command, ...args] = cmd.trim().split(" ");
+    switch (command) {
+      case "ls":
+        let obj = cursor.get_object();
+        if (!obj) {
+          write("Failed to get object");
+        }
+
+        if (!fs.isDict(obj)) {
+          write(`"${cursor.get_cwd()}" is not path.`);
+          break;
+        }
+
+        let files = obj.list();
+        write(`Current Directory: ${cursor.get_cwd()}\n`);
+        for (const file of files) {
+          let file_obj = obj.get_child(file);
+
+          write(
+            `${file.padEnd(20, " ")} ${fs.types.ObjectKind[file_obj.kind]}\n`
+          );
+        }
+
+        break;
+      case "cd":
+        const going_to = args.join(" ");
+      // if (cursor.get_object() as fs.types.Dict)
+
+      default:
+        write(`Unknown command: ${command}`);
+    }
+  }}
+/>

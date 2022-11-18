@@ -1,0 +1,9 @@
+file handler specifics
+
+<pkg>/?MimeType/Check(Object&) => u8 {
+  yes: 0
+  no: 1
+  error: errno+2
+}
+x
+<pkg>/?

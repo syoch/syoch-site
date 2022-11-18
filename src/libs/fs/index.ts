@@ -29,3 +29,28 @@ export function fromJSON(obj: object): types.Object {
     throw new Error("Unknown type");
   }
 }
+
+export function isDict(obj: any): obj is types.Dict {
+  return obj.flag_dict !== undefined;
+}
+
+export class Cursor {
+  constructor(private root: types.Object, private cwd: string) {
+
+  }
+  get_object(): types.Object {
+    let cur = this.root;
+
+    for (let dir of this.cwd.split("/")) {
+      if (!dir) continue;
+      if (isDict(cur)) {
+        cur = cur.get_child(dir);
+      }
+    }
+
+    return cur;
+  }
+  get_cwd(): String {
+    return this.cwd;
+  }
+}
