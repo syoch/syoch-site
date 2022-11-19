@@ -15,9 +15,11 @@
   });
 
   let current_prompt = prompt();
+
+  let input_elem: HTMLInputElement;
 </script>
 
-<div class="wrapper">
+<div class="wrapper" on:click={() => input_elem.focus()} on:keypress={() => {}}>
   <pre class="content">{output}</pre>
   <div class="input">
     <div class="prompt">{current_prompt}&nbsp;</div>
@@ -25,6 +27,7 @@
       class="input"
       type="text"
       bind:value={session.input}
+      bind:this={input_elem}
       on:keydown={(e) => {
         if (e.key === "Enter") {
           session.write(`${current_prompt} ${session.input}\n`);
