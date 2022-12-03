@@ -43,7 +43,7 @@ export class Int extends ValueObject<number> {
   kind = ObjectKind.Int;
 }
 
-export class String extends ValueObject<string> {
+export class StringItem extends ValueObject<string> {
   kind = ObjectKind.String;
 
   dump() {
@@ -71,7 +71,7 @@ export class List extends ValueObject<Object[]> {
   }
 
   dump() {
-    return "[" + this.get_value().map(x => x.dump()).join(",") + "]"
+    return `[${this.get_value().map(x => x.dump()).join(",")}]`
   }
 }
 
@@ -89,12 +89,12 @@ export class Dict extends ValueObject<{ [key: string]: Object }> {
 
   toJSON(): string {
     const table = this.get_value();
-    return "{" + Object.keys(table).map(key => key + ":" + ObjectKind[table[key].kind]).join(",") + "}";
+    return `{${Object.keys(table).map(key => `${key}:${ObjectKind[table[key].kind]}`).join(",")}}`;
   }
 
   dump(): string {
     const table = this.get_value();
-    return "{" + Object.keys(table).map(key => key + ":" + table[key].dump()).join(",") + "}";
+    return `{${Object.keys(table).map(key => `${key}:${table[key].dump()}`).join(",")}}`;
   }
 }
 

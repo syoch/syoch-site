@@ -13,7 +13,7 @@ export function fromJSON(obj: object): types.Object {
       return new types.Float(obj);
     }
   } else if (typeof obj === "string") {
-    return new types.String(obj);
+    return new types.StringItem(obj);
   } else if (typeof obj === "boolean") {
     return new types.Bool(obj);
   } else if (Array.isArray(obj)) {
@@ -45,7 +45,7 @@ export class Cursor {
     let cur = this.root;
 
     for (let dir of this.cwd.split("/")) {
-      if (!dir) continue;
+      if (!dir) { continue; }
       if (isDict(cur)) {
         cur = cur.get_child(dir);
       }
@@ -54,13 +54,13 @@ export class Cursor {
     return cur;
   }
   parent() {
-    this.cwd = this.cwd.split("/").slice(0, -2).join("/") + "/";
+    this.cwd = `${this.cwd.split("/").slice(0, -2).join("/")}/`;
   }
   get_cwd(): string {
     return this.cwd;
   }
 
   cd(dir_name: string) {
-    this.cwd += dir_name + "/";
+    this.cwd += `${dir_name}/`;
   }
 }

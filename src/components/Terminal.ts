@@ -3,12 +3,12 @@ import { writable } from "svelte/store";
 type OnUpdateHandler = (output: string) => void;
 
 export class TerminalSession {
-  private output = writable("");
-  public input = "";
+  public output = writable("");
 
-  public subscribe_output = this.output.subscribe;
-
-  public write(s) {
+  public backspace() {
+    this.output.update(x => x.slice(0, -1))
+  }
+  public write(s: string) {
     this.output.update(x => x + s);
   }
 }

@@ -1,46 +1,41 @@
 <script lang="ts">
   import { TerminalSession } from "./Terminal";
 
-  export let handler = (cmd: String, write: (s: String) => void) => {
+  export let command_handler = (cmd: string, write: (s: string) => void) => {
     write("<Default cmd handler> " + cmd);
     return;
   };
-  export let prompt = () => "$";
+  export let prompt = (): string => "$ ";
 
   export let session = new TerminalSession();
 
-  let output = "";
-  session.subscribe_output((x) => {
-    output = x;
-  });
+  let output = session.output;
 
-  let current_prompt = prompt();
+  $output = prompt();
 
-  let input_elem: HTMLInputElement;
+  let command = "";
 </script>
 
-<div class="wrapper" on:click={() => input_elem.focus()} on:keypress={() => {}}>
-  <pre class="content">{output}</pre>
-  <div class="input">
-    <div class="prompt">{current_prompt}&nbsp;</div>
-    <input
-      class="input"
-      type="text"
-      bind:value={session.input}
-      bind:this={input_elem}
-      on:keydown={(e) => {
-        if (e.key === "Enter") {
-          session.write(`${current_prompt} ${session.input}\n`);
-          handler(session.input, (s) => {
-            session.write(s);
-          });
-          current_prompt = prompt();
-          session.input = "";
-        }
-      }}
-    />
-  </div>
-</div>
+<pre
+  class="wrapper"
+  tabindex="-1"
+  on:keydown={(e) => {
+    console.log(e.key);
+    if (e.key === "Enter") {
+      session.write("\n");
+      command_handler(command, (s) => {
+        session.write(s);
+      });
+      command = "";
+      session.write(prompt());
+    } else if (e.key === "Backspace") {
+      session.backspace();
+      command = command.slice(0, -1);
+    } else if (e.key.length === 1) {
+      command += e.key;
+      session.write(e.key);
+    }
+  }}>{$output}</pre>
 
 <style>
   .wrapper {
@@ -50,7 +45,7 @@
     padding: 10px;
     border-radius: 5px;
 
-    height: 30rem;
+    height: 20rem;
     background-color: #444;
     color: #eee;
 
@@ -58,43 +53,5 @@
     font-size: 18px;
 
     overflow: scroll;
-  }
-
-  .wrapper > *,
-  .wrapper > * > * {
-    font: inherit;
-    background-color: transparent;
-
-    box-sizing: border-box;
-  }
-
-  .wrapper > .content {
-    margin: 0px;
-    padding: 0px;
-
-    overflow: hidden;
-  }
-
-  .wrapper > .input {
-    position: relative;
-    height: 1em;
-
-    display: flex;
-    width: 100%;
-  }
-
-  .wrapper > .input > * {
-    height: 1em;
-
-    padding: 0;
-    margin: 0;
-  }
-  .wrapper > .input > input {
-    flex-grow: 1;
-    padding: 0 auto 0 0;
-    color: #fff;
-
-    border: none;
-    outline: none;
   }
 </style>

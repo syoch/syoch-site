@@ -89,10 +89,13 @@
       .filter(Boolean)
       .map((x) => (x[0] == "?" ? x.slice(0, 2) : x[0]))
       .join("/") +
-    " $"}
-  handler={(cmd, write) => {
+    "\n$ "}
+  command_handler={(cmd, write) => {
     let [command, ...args] = cmd.trim().split(" ");
     switch (command) {
+      case "": {
+        break;
+      }
       case "ls": {
         const obj = cursor.get_object();
         if (!obj) {
@@ -136,18 +139,28 @@
           break;
         }
 
-        if (fs.isDict(obj)) {
-          const new_obj = obj.get_child(going_to);
-          if (!fs.isDict(new_obj)) {
-            write(`Cannot cd to non-Dict object`);
-          }
-          cursor.cd(going_to);
+        if (!fs.isDict(obj)) {
+          write(
+            `cd: Assertation failed. a item that cursors is not dict object\n`
+          );
+          break;
         }
+
+        const new_obj = obj.get_child(going_to);
+        if (!new_obj) {
+          write(`No such file or directory: ${going_to}\n`);
+          break;
+        }
+        if (!fs.isDict(new_obj)) {
+          write(`Cannot cd to non-Dict object\n`);
+        }
+        cursor.cd(going_to);
+
         break;
       }
 
       default:
-        write(`Unknown command: ${command}`);
+        write(`Unknown command: ${command}\n`);
     }
   }}
 />
