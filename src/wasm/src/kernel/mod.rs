@@ -5,16 +5,16 @@ enum PollResult<Ret> {
     Done(Ret),
 }
 
-trait Process<Ret> {
-    fn poll(&mut self) -> PollResult<Ret>;
+trait Process {
+    fn poll(&mut self) -> PollResult<i64>;
 }
 
-struct Kernel<P: Process<i64>> {
-    processes: HashMap<u128, P>,
+struct Kernel {
+    processes: HashMap<u128, Box<dyn Process>>,
 }
 
-impl<P: Process<i64>> Kernel<P> {
-    pub fn new() -> Kernel<P> {
+impl Kernel {
+    pub fn new() -> Kernel {
         Kernel {
             processes: HashMap::new(),
         }
@@ -30,10 +30,10 @@ impl<P: Process<i64>> Kernel<P> {
         return pid;
     }
 
-    pub fn register_process(&mut self, process: P) {
+    pub fn register_process<P: 'static + Process>(&mut self, process: P) {
         let pid = self.find_free_pid();
 
-        self.processes.insert(pid, process);
+        self.processes.insert(pid, Box::new(process));
     }
 
     pub fn start(&mut self) {
@@ -71,7 +71,32 @@ mod test {
         }
     }
 
-    impl Process<i64> for TestProcess {
+    impl Process for TestProcess {
+        fn poll(&mut self) -> PollResult<i64> {
+            println!("n = {}", self.n);
+            self.n += 1;
+
+            if self.n == self.stop {
+                return PollResult::Done(0 as i64);
+            } else {
+                return PollResult::Pending;
+            }
+        }
+    }
+    //
+
+    struct TestProcess2 {
+        n: u8,
+        stop: u8,
+    }
+
+    impl TestProcess2 {
+        fn new(n: u8) -> TestProcess2 {
+            TestProcess2 { n, stop: n + 10 }
+        }
+    }
+
+    impl Process for TestProcess2 {
         fn poll(&mut self) -> PollResult<i64> {
             println!("n = {}", self.n);
             self.n += 1;
@@ -87,7 +112,7 @@ mod test {
     #[test]
     fn kernel() {
         let p1 = TestProcess::new(0);
-        let p2 = TestProcess::new(10);
+        let p2 = TestProcess2::new(10);
         let mut k = Kernel::new();
 
         k.register_process(p1);
