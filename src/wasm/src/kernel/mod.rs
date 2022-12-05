@@ -9,8 +9,11 @@ trait Process {
     fn poll(&mut self) -> PollResult<i64>;
 }
 
+struct FileSystem {}
+
 struct Kernel {
     processes: HashMap<u128, Box<dyn Process>>,
+    fs: FileSystem,
 }
 
 impl Kernel {
