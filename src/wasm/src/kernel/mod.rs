@@ -1,8 +1,14 @@
 use std::{collections::HashMap, hash::Hash};
 
+#[derive(Debug)]
+enum Syscall {
+    Lock(String),
+}
+
 enum PollResult<Ret> {
     Pending,
     Done(Ret),
+    Syscall(Syscall),
 }
 
 trait Process {
@@ -96,6 +102,9 @@ impl Kernel {
                     PollResult::Done(n) => {
                         println!("Process<{pid}> Returns {n}");
                         process_to_kill.push(*pid);
+                    }
+                    PollResult::Syscall(s) => {
+                        println!("{pid}: {s:?}");
                     }
                 }
             }
