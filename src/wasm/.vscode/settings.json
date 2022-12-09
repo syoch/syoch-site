@@ -2,7 +2,7 @@
   "saveAndRun": {
     "commands": [
       {
-        "cmd": "cargo test"
+        "cmd": "cargo test kernel::test::kernel -- --nocapture   "
       }
     ]
   }
