@@ -3,6 +3,12 @@ pub enum Syscall {
     Lock(String),
 }
 
+#[derive(Debug)]
+pub enum SyscallData {
+    Lock(u128, bool),
+    None,
+}
+
 pub enum PollResult<Ret> {
     Pending,
     Done(Ret),
@@ -10,5 +16,5 @@ pub enum PollResult<Ret> {
 }
 
 pub trait Process {
-    fn poll(&mut self) -> PollResult<i64>;
+    fn poll(&mut self, data: &SyscallData) -> PollResult<i64>;
 }
