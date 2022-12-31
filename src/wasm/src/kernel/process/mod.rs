@@ -1,3 +1,5 @@
+mod kernel_process;
+pub use kernel_process::KernelProcess;
 #[derive(Debug)]
 pub enum Syscall {
     Lock(String),

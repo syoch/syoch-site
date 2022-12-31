@@ -2,7 +2,8 @@
   "saveAndRun": {
     "commands": [
       {
-        "cmd": "cargo test kernel::test::kernel -- --nocapture   "
+        // "cmd": "cargo test kernel::test::kernel -- --nocapture   "
+        "cmd": "RUST_BACKTRACE=full cargo run"
       }
     ]
   }
