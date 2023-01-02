@@ -3,10 +3,7 @@ use std::sync::Mutex;
 use once_cell::sync::Lazy;
 use rustpython::InterpreterConfig;
 
-use rustpython_vm::{
-    builtins::PyBaseException, convert::IntoPyException, Interpreter, PyRef, Settings,
-    VirtualMachine,
-};
+use rustpython_vm::{builtins::PyBaseException, Interpreter, PyRef, Settings, VirtualMachine};
 
 pub fn panic_py_except(e: PyRef<PyBaseException>, vm: &VirtualMachine) -> ! {
     println!(
@@ -26,10 +23,7 @@ pub fn panic_py_except(e: PyRef<PyBaseException>, vm: &VirtualMachine) -> ! {
         }
     }
     std::process::exit(1);
-    unreachable!();
 }
-
-fn init_vm(vm: &VirtualMachine) {}
 
 static INTERPRETER: Lazy<Mutex<Interpreter>> = Lazy::new(|| {
     println!("Initializing Python VM...");
@@ -41,7 +35,6 @@ static INTERPRETER: Lazy<Mutex<Interpreter>> = Lazy::new(|| {
         .init_stdlib()
         .interpreter();
 
-    interp.enter(init_vm);
     println!("Initializing Python VM...DONE!");
 
     Mutex::new(interp)

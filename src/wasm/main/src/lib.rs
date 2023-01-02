@@ -4,7 +4,6 @@ use ghs_demangle::demangle;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 mod generator;
-mod kernel;
 
 pub use generator::generate_user_id;
 

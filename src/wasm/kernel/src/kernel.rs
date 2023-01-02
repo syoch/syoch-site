@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::kernel::process::{Syscall, SyscallData};
+use crate::process::{Syscall, SyscallData};
 
 use super::{
     automap::AutoMap,
