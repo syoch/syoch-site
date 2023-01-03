@@ -1,5 +1,17 @@
 mod kernel_process;
 pub use kernel_process::KernelProcess;
+
+#[derive(Debug)]
+pub struct Lock {
+    pub id: u128,
+}
+
+impl Lock {
+    pub fn new(id: u128) -> Lock {
+        Lock { id }
+    }
+}
+
 #[derive(Debug)]
 pub enum Syscall {
     Lock(String),
@@ -7,7 +19,7 @@ pub enum Syscall {
 
 #[derive(Debug)]
 pub enum SyscallData {
-    Lock(u128, bool),
+    Lock(Option<Lock>),
     None,
 }
 

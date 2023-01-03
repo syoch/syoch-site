@@ -1,11 +1,12 @@
-mod generator;
 mod generator_wrapper;
 
+mod python;
 extern crate kernel;
 
 use generator_wrapper::GeneratorWrapepr;
 
-use kernel::{get_interpreter, Kernel, PollResult, Process, SyscallData};
+use kernel::{Kernel, PollResult, Process, SyscallData};
+use python::{panic_py_except, python_enter};
 use rustpython_vm::{convert::IntoPyException, PyResult};
 
 struct TestProcess {
@@ -16,11 +17,54 @@ impl TestProcess {
     fn new() -> PyResult<TestProcess> {
         Ok(TestProcess {
             generator: GeneratorWrapepr::new(
-                r#"def gen():
-        yield 1
-        yield 0x01
-        yield 0x01
-        yield 0x47
+                r#"
+import cworks
+
+class CWorkProtocol:
+    incoming_data = None
+
+    @staticmethod
+    def on_recv_value(d):
+        incoming_data = d
+
+    @staticmethod
+    def send_value(d):
+        cworks.send_value(d)
+
+    @staticmethod
+    async def pending():
+        cworks.send_value(0x00000000)
+        return await
+
+    @staticmethod
+    async def lock_obj(p):
+        await
+        CWorks.send_value(0x02000000)
+        string(p)
+
+    @staticmethod
+    def string(s):
+        CWorks.send_value(len(s))
+        for c in s:
+            CWorks.send_value(ord(c))
+
+ori_print = print
+def print(s):
+    CWorks.send_value(0x01000000)
+    string(s)
+
+async def proc():
+    lock = await CWorks.lock_obj("/")
+    print(lock)
+
+def gen():
+    coro = proc()
+    while True:
+        try:
+            yield coro.send(None)
+        except StopIteration:
+            break
+
 gen()"#
                     .to_string(),
             )?,
@@ -29,28 +73,34 @@ gen()"#
 }
 
 impl Process for TestProcess {
-    fn poll(&mut self, _data: &SyscallData) -> PollResult<i64> {
+    fn poll(&mut self, data: &SyscallData) -> PollResult<i64> {
+        self.generator.pass(data);
         let a = self.generator.step();
         if let Err(e) = a {
-            let interp = get_interpreter().lock().unwrap();
-            interp.enter(|vm| {
-                kernel::panic_py_except(e.into_pyexception(vm), vm);
+            python_enter(|vm| {
+                panic_py_except(e.into_pyexception(vm), vm);
             });
             unreachable!();
         }
-        let a = a.unwrap();
-
-        if let Some(a) = a {
-            println!("a: {}", a);
-            PollResult::Pending
-        } else {
-            PollResult::Done(0)
+        let a = a.unwrap().map(|x| x.to_be_bytes());
+        match a {
+            Some([0x00, 0x00, 0x00, 0x00]) => PollResult::Pending,
+            Some([0x01, 0, 0, 0]) => {
+                println!("{}", self.generator.read_string().unwrap());
+                PollResult::Pending
+            }
+            Some([0x02, 0, 0, 0]) => {
+                let path = self.generator.read_string().unwrap();
+                PollResult::Syscall(kernel::Syscall::Lock(path))
+            }
+            None => PollResult::Done(0),
+            _ => panic!("Unexcepted value: a={a:?}"),
         }
     }
 }
 
 fn main() {
-    let mut k = Kernel::new();
+    let mut k = Kernel::default();
 
     let p1 = TestProcess::new().unwrap();
 

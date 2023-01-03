@@ -3,7 +3,7 @@
     "commands": [
       {
         // "cmd": "cargo test kernel::test::kernel -- --nocapture   "
-        "cmd": "RUST_BACKTRACE=full cargo run"
+        "cmd": "cargo run"
       }
     ]
   }

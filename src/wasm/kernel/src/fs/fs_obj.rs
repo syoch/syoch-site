@@ -24,10 +24,10 @@ impl From<&FSObj> for String {
             FSObj::List(l) => {
                 "[".to_string()
                     + &l.iter()
-                        .map(|x| String::from(x))
+                        .map(String::from)
                         .collect::<Vec<String>>()
                         .join(", ")
-                    + &"]".to_string()
+                    + "]"
             }
             FSObj::Dist(d) => {
                 "{".to_string()
@@ -35,9 +35,9 @@ impl From<&FSObj> for String {
                         .map(|(k, v)| format!("{}: {}", k, String::from(v)))
                         .collect::<Vec<String>>()
                         .join(", ")
-                    + &"}".to_string()
+                    + "}"
             }
-            FSObj::Null => format!(""),
+            FSObj::Null => String::new(),
         }
     }
 }

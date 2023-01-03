@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::process::{Syscall, SyscallData};
+use crate::process::{Lock, Syscall, SyscallData};
 
 use super::{
     automap::AutoMap,
@@ -15,14 +15,17 @@ pub struct Kernel {
     locks: AutoMap<LockedResource>,
 }
 
-impl Kernel {
-    pub fn new() -> Kernel {
+impl Default for Kernel {
+    fn default() -> Kernel {
         Kernel {
             processes: AutoMap::new(),
             locks: AutoMap::new(),
             fs_root: FSObj::Dist(HashMap::new()),
         }
     }
+}
+
+impl Kernel {
     pub fn register_process(&mut self, p: Box<dyn Process>) {
         self.processes.add_value(p.into());
     }
@@ -43,8 +46,20 @@ impl Kernel {
                     }
                     PollResult::Syscall(s) => {
                         match s {
-                            Syscall::Lock(ref _path) => {
-                                p.system_call_returns = SyscallData::Lock(0, true);
+                            Syscall::Lock(ref path) => {
+                                for lock in self.locks.map.values() {
+                                    if let KernelResource::Object(ref path2) = lock.get_resource() {
+                                        if path.starts_with(path2) {
+                                            p.system_call_returns = SyscallData::Lock(None);
+                                            break;
+                                        }
+                                    }
+                                }
+                                let res =
+                                    LockedResource::new(KernelResource::Object(path.to_string()));
+                                let key = self.locks.add_value(res);
+                                p.system_call_returns =
+                                    SyscallData::Lock(Option::Some(Lock::new(key)));
                             }
                         }
                         println!("{pid}: {s:?}");

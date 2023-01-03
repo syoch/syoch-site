@@ -1,3 +1,5 @@
+mod python;
+
 extern crate ghs_demangle;
 
 use ghs_demangle::demangle;

@@ -15,4 +15,7 @@ impl LockedResource {
             pid: 0,
         }
     }
+    pub fn get_resource(&self) -> &KernelResource {
+        &self.resource
+    }
 }
