@@ -14,11 +14,43 @@ struct Python {
 
 #[pymodule]
 mod cworks {
-    use rustpython_vm::{builtins::PyCoroutine, PyObjectRef, VirtualMachine};
+    use rustpython_vm::{
+        builtins::{PyCoroutine, PyNone},
+        PyObjectRef, PyResult, VirtualMachine,
+    };
+
+    use super::push_value;
 
     #[pyfunction]
     fn send_value(c: PyObjectRef, vm: &VirtualMachine) {
         super::push_value(c.try_int(vm).unwrap().as_u32_mask());
+    }
+
+    #[pyfunction]
+    fn pending(vm: &VirtualMachine) {
+        push_value(0x0000_0000);
+    }
+
+    #[pyfunction]
+    fn string(c: PyObjectRef, vm: &VirtualMachine) -> PyResult<PyObjectRef> {
+        let s = c.str(vm)?.to_string();
+        push_value(s.len() as u32);
+        for c in s.bytes() {
+            push_value(c as u32);
+        }
+
+        Ok(vm.ctx.none())
+    }
+
+    #[pyfunction]
+    fn print(c: PyObjectRef, vm: &VirtualMachine) -> PyResult<PyObjectRef> {
+        let s = c.str(vm)?.to_string();
+        push_value(s.len() as u32);
+        for c in s.bytes() {
+            push_value(c as u32);
+        }
+
+        Ok(vm.ctx.none())
     }
 }
 

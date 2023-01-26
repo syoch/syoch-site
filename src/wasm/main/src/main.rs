@@ -20,7 +20,7 @@ impl TestProcess {
                 r#"
 import cworks
 
-class CWorkProtocol:
+class CWorks:
     incoming_data = None
 
     @staticmethod
@@ -33,14 +33,13 @@ class CWorkProtocol:
 
     @staticmethod
     async def pending():
-        cworks.send_value(0x00000000)
+        CWorks.send_value(0x00000000)
         return await
 
     @staticmethod
     async def lock_obj(p):
-        await
         CWorks.send_value(0x02000000)
-        string(p)
+        CWorks.string(p)
 
     @staticmethod
     def string(s):
@@ -48,10 +47,10 @@ class CWorkProtocol:
         for c in s:
             CWorks.send_value(ord(c))
 
-ori_print = print
-def print(s):
-    CWorks.send_value(0x01000000)
-    string(s)
+    @staticmethod
+    def print(s):
+        CWorks.send_value(0x01000000)
+        Cworks.string(s)
 
 async def proc():
     lock = await CWorks.lock_obj("/")
