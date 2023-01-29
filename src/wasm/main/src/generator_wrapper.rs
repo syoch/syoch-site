@@ -1,7 +1,7 @@
 use crate::python::{panic_py_except, python_enter};
 use kernel::SyscallData;
 use rustpython_vm::{
-    builtins::{PyInt, PyIntRef},
+    builtins::PyInt,
     convert::{IntoObject, IntoPyException},
     protocol::{PyIter, PyIterReturn},
     PyObjectRef, PyPayload, PyResult,
@@ -26,32 +26,15 @@ impl GeneratorWrapepr {
         Ok(Self { generator })
     }
 
-    pub fn step(&self) -> PyResult<Option<u32>> {
+    pub fn step(&self) -> PyResult<bool> {
         python_enter(|vm| {
             let r = PyIter::new(self.generator.clone()).next(vm)?;
-
             let ret = match r {
-                PyIterReturn::Return(value) => {
-                    let r = value.try_into_value::<PyIntRef>(vm);
-                    if let Err(e) = r {
-                        panic_py_except(e.into_pyexception(vm), vm);
-                    }
-                    Some(r.unwrap().as_u32_mask())
-                }
-                PyIterReturn::StopIteration(_) => None,
+                PyIterReturn::Return(_value) => true,
+                PyIterReturn::StopIteration(_) => false,
             };
             Ok(ret)
         })
-    }
-
-    pub fn read_string(&self) -> PyResult<String> {
-        let length = self.step()?.unwrap();
-        let mut ret = String::new();
-        for _ in 0..length {
-            let c = self.step()?.unwrap();
-            ret.push(c as u8 as char);
-        }
-        Ok(ret)
     }
 
     pub fn pass(&self, data: &SyscallData) {

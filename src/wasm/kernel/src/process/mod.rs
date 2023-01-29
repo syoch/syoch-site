@@ -29,6 +29,6 @@ pub enum PollResult<Ret> {
     Syscall(Syscall),
 }
 
-pub trait Process {
+pub trait Process: Sync + Send {
     fn poll(&mut self, data: &SyscallData) -> PollResult<i64>;
 }

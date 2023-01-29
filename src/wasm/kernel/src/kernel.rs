@@ -1,17 +1,15 @@
-use std::collections::HashMap;
-
 use crate::process::{Lock, Syscall, SyscallData};
 
 use super::{
     automap::AutoMap,
-    fs::FSObj,
+    // fs::FSObj,
     process::{KernelProcess, PollResult, Process},
     resources::{KernelResource, LockedResource},
 };
 
 pub struct Kernel {
     processes: AutoMap<KernelProcess>,
-    fs_root: FSObj,
+    // fs_root: FSObj,
     locks: AutoMap<LockedResource>,
 }
 
@@ -20,7 +18,7 @@ impl Default for Kernel {
         Kernel {
             processes: AutoMap::new(),
             locks: AutoMap::new(),
-            fs_root: FSObj::Dist(HashMap::new()),
+            // fs_root: FSObj::Dist(HashMap::new()),
         }
     }
 }

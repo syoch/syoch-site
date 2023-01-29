@@ -6,8 +6,10 @@ extern crate kernel;
 use generator_wrapper::GeneratorWrapepr;
 
 use kernel::{Kernel, PollResult, Process, SyscallData};
-use python::{panic_py_except, python_enter};
+use python::panic_py_except;
 use rustpython_vm::{convert::IntoPyException, PyResult};
+
+use crate::python::python_enter;
 
 struct TestProcess {
     generator: GeneratorWrapepr,
@@ -18,53 +20,39 @@ impl TestProcess {
         Ok(TestProcess {
             generator: GeneratorWrapepr::new(
                 r#"
-import cworks
+import cworks as _c_works
+import asyncio
+import io
 
 class CWorks:
-    incoming_data = None
-
-    @staticmethod
-    def on_recv_value(d):
-        incoming_data = d
-
-    @staticmethod
-    def send_value(d):
-        cworks.send_value(d)
-
-    @staticmethod
-    async def pending():
-        CWorks.send_value(0x00000000)
-        return await
-
-    @staticmethod
-    async def lock_obj(p):
-        CWorks.send_value(0x02000000)
-        CWorks.string(p)
-
-    @staticmethod
-    def string(s):
-        CWorks.send_value(len(s))
-        for c in s:
-            CWorks.send_value(ord(c))
-
-    @staticmethod
     def print(s):
-        CWorks.send_value(0x01000000)
-        Cworks.string(s)
+        _c_works.print(s)
+
+    async def step():
+        await asyncio.sleep(0)
+
+print_org=print
+def print(*a, **k):
+    buf = io.StringIO()
+    print_org(*a, **k, file=buf)
+    _c_works.print(buf.getvalue())
 
 async def proc():
-    lock = await CWorks.lock_obj("/")
-    print(lock)
+    lock = print("/")
+    print(f"lock = {lock}")
 
-def gen():
+    await CWorks.step()
+
+def wrapper():
     coro = proc()
     while True:
         try:
             yield coro.send(None)
         except StopIteration:
             break
+    yield None
 
-gen()"#
+wrapper()"#
                     .to_string(),
             )?,
         })
@@ -81,20 +69,7 @@ impl Process for TestProcess {
             });
             unreachable!();
         }
-        let a = a.unwrap().map(|x| x.to_be_bytes());
-        match a {
-            Some([0x00, 0x00, 0x00, 0x00]) => PollResult::Pending,
-            Some([0x01, 0, 0, 0]) => {
-                println!("{}", self.generator.read_string().unwrap());
-                PollResult::Pending
-            }
-            Some([0x02, 0, 0, 0]) => {
-                let path = self.generator.read_string().unwrap();
-                PollResult::Syscall(kernel::Syscall::Lock(path))
-            }
-            None => PollResult::Done(0),
-            _ => panic!("Unexcepted value: a={a:?}"),
-        }
+        PollResult::Done(0i64)
     }
 }
 
