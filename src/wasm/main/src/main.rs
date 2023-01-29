@@ -19,39 +19,11 @@ impl TestProcess {
     fn new() -> PyResult<TestProcess> {
         Ok(TestProcess {
             generator: GeneratorWrapepr::new(
-                r#"
-import cworks as _c_works
-import asyncio
-import io
-
-class CWorks:
-    def print(s):
-        _c_works.print(s)
-
-    async def step():
-        await asyncio.sleep(0)
-
-print_org=print
-def print(*a, **k):
-    buf = io.StringIO()
-    print_org(*a, **k, file=buf)
-    _c_works.print(buf.getvalue())
-
-async def proc():
+                r#"async def proc():
     lock = print("/")
     print(f"lock = {lock}")
 
-    await CWorks.step()
-
-def wrapper():
-    coro = proc()
-    while True:
-        try:
-            yield coro.send(None)
-        except StopIteration:
-            break
-    yield None
-
+    await cw.pending()
 wrapper()"#
                     .to_string(),
             )?,
@@ -61,13 +33,11 @@ wrapper()"#
 
 impl Process for TestProcess {
     fn poll(&mut self, data: &SyscallData) -> PollResult<i64> {
-        self.generator.pass(data);
-        let a = self.generator.step();
-        if let Err(e) = a {
+        // TODO send data to generator
+        if let Err(e) = self.generator.step() {
             python_enter(|vm| {
                 panic_py_except(e.into_pyexception(vm), vm);
             });
-            unreachable!();
         }
         PollResult::Done(0i64)
     }
