@@ -1,7 +1,7 @@
 mod kernel_process;
 pub use kernel_process::KernelProcess;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Lock {
     pub id: u128,
 }
@@ -12,21 +12,34 @@ impl Lock {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Syscall {
     Lock(String),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum SyscallData {
     Lock(Option<Lock>),
     None,
 }
 
+impl Default for SyscallData {
+    fn default() -> Self {
+        SyscallData::None
+    }
+}
+
+#[derive(Clone)]
 pub enum PollResult<Ret> {
     Pending,
     Done(Ret),
     Syscall(Syscall),
+}
+
+impl<T> Default for PollResult<T> {
+    fn default() -> Self {
+        PollResult::Pending
+    }
 }
 
 pub trait Process: Sync + Send {

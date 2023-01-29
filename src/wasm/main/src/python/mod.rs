@@ -52,6 +52,14 @@ import io
 async def step():
     await asyncio.sleep(0)
 
+async def pending():
+    cw.pending();
+    await asyncio.sleep(0)
+
+async def done(r):
+    cw.done(r)
+    await asyncio.sleep(0)
+
 print_org=print
 def print(*a, **k):
     buf = io.StringIO()
@@ -64,8 +72,8 @@ def wrapper():
         try:
             yield coro.send(None)
         except StopIteration:
-            break
-    yield None
+            cw.done(0)
+            yield None
 "#,
     );
     if let Err(e) = r {

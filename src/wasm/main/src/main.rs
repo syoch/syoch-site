@@ -20,10 +20,14 @@ impl TestProcess {
         Ok(TestProcess {
             generator: GeneratorWrapepr::new(
                 r#"async def proc():
-    lock = print("/")
-    print(f"lock = {lock}")
+    print("print")
+    print("/")
 
-    await cw.pending()
+    print("step")
+    await step()
+
+    print("pending")
+    await pending()
 wrapper()"#
                     .to_string(),
             )?,
@@ -33,13 +37,18 @@ wrapper()"#
 
 impl Process for TestProcess {
     fn poll(&mut self, data: &SyscallData) -> PollResult<i64> {
-        // TODO send data to generator
+        {
+            let mut a = python::cworks::STATE.lock().unwrap();
+            a.syscall_result = data.clone();
+        }
+
         if let Err(e) = self.generator.step() {
             python_enter(|vm| {
                 panic_py_except(e.into_pyexception(vm), vm);
             });
         }
-        PollResult::Done(0i64)
+        let a = python::cworks::STATE.lock().unwrap();
+        return a.poll_result.clone();
     }
 }
 

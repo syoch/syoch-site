@@ -1,10 +1,7 @@
-use crate::python::{init_scope, panic_py_except, python_enter};
-use kernel::SyscallData;
+use crate::python::{init_scope, python_enter};
 use rustpython_vm::{
-    builtins::PyInt,
-    convert::IntoObject,
     protocol::{PyIter, PyIterReturn},
-    PyObjectRef, PyPayload, PyResult,
+    PyObjectRef, PyResult,
 };
 
 pub struct GeneratorWrapepr {
@@ -25,9 +22,7 @@ impl GeneratorWrapepr {
 
     pub fn step(&self) -> PyResult<bool> {
         python_enter(|vm| {
-            println!("Stepping");
             let r = PyIter::new(self.generator.clone()).next(vm)?;
-            println!("Stepped");
             let ret = match r {
                 PyIterReturn::Return(_value) => true,
                 PyIterReturn::StopIteration(_) => false,
