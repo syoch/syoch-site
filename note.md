@@ -100,3 +100,15 @@ abcdefghABCDEFGH みたいな形式（[\w0-9-_]{16}）
     - /auth/salt: POST "id=..."
     - /auth/login: POST "id=...&salt=...&hash=<SHA512>"
   - spec.json: `{"features": ["serve", "auth"]}`
+
+## Cat Script
+
+### Example
+
+```plain
+# Copy cworks://skins.wiiu.org/0.pck (cftp://192.168.3.16/.../DLC/{pack}/skins.pck|pck.pck)
+pck = Fetch cworks://skins.wiiu.org/0.pck cache='auto update'
+for (fname, file) in pck.Keys() {
+  Copy file cworks://me/workspace/0.pck/{fname}
+}
+```
