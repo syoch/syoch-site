@@ -42,23 +42,24 @@ pub fn panic_py_except(e: PyRef<PyBaseException>, vm: &VirtualMachine) -> ! {
 }
 
 pub fn init_scope<'a>(vm: &VirtualMachine, scope: &'a Scope) -> PyResult<&'a Scope> {
+    println!("Running script.");
     let r = vm.run_block_expr(
         scope.clone(),
         r#"
 import cw
-import asyncio
 import io
 
 async def step():
+    import asyncio
     await asyncio.sleep(0)
 
 async def pending():
     cw.pending();
-    await asyncio.sleep(0)
+    await step()
 
 async def done(r):
     cw.done(r)
-    await asyncio.sleep(0)
+    await step()
 
 print_org=print
 def print(*a, **k):
@@ -76,6 +77,7 @@ def wrapper():
             yield None
 "#,
     );
+    println!("Running script.");
     if let Err(e) = r {
         panic_py_except(e, vm);
     }
@@ -91,7 +93,7 @@ static PYTHON: Lazy<Mutex<Python>> = Lazy::new(|| {
         .settings(setting)
         .init_stdlib()
         .init_hook(Box::new(|vm| {
-            vm.add_native_module("cw", Box::new(cworks::cworks_mod::make_module))
+            vm.add_native_module("cw", Box::new(cworks::cworks_mod::make_module));
         }))
         .interpreter();
 
