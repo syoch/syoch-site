@@ -1,12 +1,11 @@
 use std::sync::Mutex;
 
-use kernel::{PollResult, Syscall, SyscallData};
+use kernel::{PollResult, SyscallData};
 use once_cell::sync::Lazy;
 use rustpython_vm::pymodule;
 
 #[derive(Default)]
 pub struct State {
-    going_syscall: Option<Syscall>,
     pub syscall_result: SyscallData,
     pub poll_result: PollResult<i64>,
 }

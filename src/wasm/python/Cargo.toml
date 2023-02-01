@@ -1,22 +1,18 @@
 [package]
-name = "wasm"
+name = "python"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-# [lib]
-# crate-type = ["cdylib"]
-
+[lib]
+name = "python"
 
 [features]
 default = ["wasmer"]
 wasmer = []
 
 [dependencies]
-ghs_demangle = { git = "https://github.com/syoch/ghs_demangle"}
-wasm-bindgen = "0.2.83"
-chrono = "0.4.22"
 rustpython = { git = "https://github.com/RustPython/RustPython", features=["freeze-stdlib"] }
 rustpython-vm = { git = "https://github.com/RustPython/RustPython", features=["freeze-stdlib"] }
 rustpython-stdlib = { git = "https://github.com/RustPython/RustPython", features=["threading", "zlib", "bz2", "ssl", "ssl-vendor"]  }

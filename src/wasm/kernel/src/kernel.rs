@@ -46,11 +46,10 @@ impl Kernel {
                         match s {
                             Syscall::Lock(ref path) => {
                                 for lock in self.locks.map.values() {
-                                    if let KernelResource::Object(ref path2) = lock.get_resource() {
-                                        if path.starts_with(path2) {
-                                            p.system_call_returns = SyscallData::Lock(None);
-                                            break;
-                                        }
+                                    let KernelResource::Object(ref path2) = lock.get_resource();
+                                    if path.starts_with(path2) {
+                                        p.system_call_returns = SyscallData::Lock(None);
+                                        break;
                                     }
                                 }
                                 let res =
